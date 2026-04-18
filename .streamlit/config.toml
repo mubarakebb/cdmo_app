@@ -1,0 +1,14 @@
+[theme]
+# A clean, thesis-friendly palette (works well with Plotly too)
+primaryColor = "#2E86AB"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F6F8FB"
+textColor = "#0F172A"
+font = "sans serif"
+
+[client]
+toolbarMode = "minimal"
+
+[ui]
+hideTopBar = true
+
