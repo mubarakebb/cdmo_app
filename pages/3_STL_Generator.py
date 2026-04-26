@@ -6,6 +6,8 @@ Design and generate optimised carrier geometries from scratch.
 import streamlit as st
 import plotly.graph_objects as go
 import numpy as np
+import io
+import trimesh
 import sys
 import os
 import tempfile
@@ -19,6 +21,12 @@ from core.geometry import analyze_stl
 from core.flow_analysis import compute_flow_metrics
 from core.buoyancy import compare_materials_buoyancy
 from core.materials import FLUID_PROPERTIES
+from core.commercial_carriers import (
+    COMMERCIAL_CARRIERS,
+    compare_to_commercial,
+    PUBLISHED_MBBR_TABLE_MD,
+    PUBLISHED_MBBR_REFERENCES,
+)
 
 st.set_page_config(page_title="STL Generator", page_icon="🖨️", layout="wide")
 
@@ -54,6 +62,46 @@ Generate new STL files directly from the CDMO framework.
 Adjust geometric parameters, preview the predicted performance metrics,
 and download the STL for 3D printing validation.
 """)
+
+
+def stl_mesh_figure(stl_bytes: bytes, title: str = "3D STL View") -> go.Figure:
+    """Create an interactive Plotly 3D mesh figure from STL bytes."""
+    mesh = trimesh.load(io.BytesIO(stl_bytes), file_type="stl", force="mesh")
+    vertices = np.asarray(mesh.vertices)  # type: ignore
+    faces = np.asarray(mesh.faces)  # type: ignore
+
+    fig = go.Figure(
+        data=[
+            go.Mesh3d(
+                x=vertices[:, 0],
+                y=vertices[:, 1],
+                z=vertices[:, 2],
+                i=faces[:, 0],
+                j=faces[:, 1],
+                k=faces[:, 2],
+                intensity=vertices[:, 2],
+                colorscale="Viridis",
+                flatshading=True,
+                opacity=1.0,
+                showscale=False,
+                lighting=dict(ambient=0.45, diffuse=0.7, roughness=0.6, specular=0.2),
+                lightposition=dict(x=200, y=100, z=150),
+            )
+        ]
+    )
+    fig.update_layout(
+        title=title,
+        height=520,
+        margin=dict(l=0, r=0, t=36, b=0),
+        scene=dict(
+            xaxis_title="X (mm)",
+            yaxis_title="Y (mm)",
+            zaxis_title="Z (mm)",
+            aspectmode="data",
+            camera=dict(eye=dict(x=1.5, y=1.5, z=1.0)),
+        ),
+    )
+    return fig
 
 # ─── Sidebar: Design Parameters ──────────────────────────────────────────────
 with st.sidebar:
@@ -180,6 +228,8 @@ if generate_btn:
 if "generated_geo" in st.session_state:
     geo = st.session_state.generated_geo
     out_path = st.session_state.generated_stl_path
+    with open(out_path, "rb") as f:
+        stl_bytes = f.read()
 
     st.markdown("### Generated Design — Verified Metrics")
 
@@ -189,6 +239,14 @@ if "generated_geo" in st.session_state:
     col3.metric("SA/V Ratio (mm⁻¹)", f"{geo.sav_ratio:.4f}")
     col4.metric("Porosity", f"{geo.porosity:.4f}")
     col5.metric("Specific SA (m²/m³)", f"{geo.specific_surface_area:.1f}")
+
+    st.markdown("---")
+
+    st.markdown("### 3D STL Preview")
+    st.plotly_chart(
+        stl_mesh_figure(stl_bytes, title=f"Generated {params.design_type.replace('_', ' ').title()} Carrier"),
+        use_container_width=True,
+    )
 
     st.markdown("---")
 
@@ -229,8 +287,6 @@ if "generated_geo" in st.session_state:
 
     # Download
     st.markdown("### Download Generated STL")
-    with open(out_path, "rb") as f:
-        stl_bytes = f.read()
 
     design_name = f"cdmo_{design_type}_D{int(outer_diameter)}H{int(height)}_fins{num_fins}.stl"
     st.download_button(
@@ -244,3 +300,111 @@ if "generated_geo" in st.session_state:
     st.caption(f"File: {design_name} | "
                f"Size: {len(stl_bytes)/1024:.1f} KB | "
                f"Triangles: {geo.num_triangles:,}")
+
+    st.markdown("---")
+    st.markdown("### Commercial Carrier Comparison")
+    st.caption("How your generated design compares to published MBBR media specifications.")
+
+    # Compare generated design to commercial carriers
+    comp_data = compare_to_commercial(
+        user_sav=geo.sav_ratio,
+        user_porosity=geo.porosity,
+        user_specific_sa=geo.specific_surface_area
+    )
+
+    col_comp1, col_comp2, col_comp3 = st.columns(3)
+    with col_comp1:
+        st.markdown("**SA/V Ratio**")
+        st.metric(
+            "Your Design",
+            f"{comp_data['user_sav']:.4f} mm⁻¹",
+            f"Percentile: {comp_data['sav_percentile']:.0f}%"
+        )
+        st.caption(f"vs. {comp_data['mean_commercial_sav']:.4f} (avg)")
+    with col_comp2:
+        st.markdown("**Porosity**")
+        st.metric(
+            "Your Design",
+            f"{comp_data['user_porosity']:.4f}",
+            f"Percentile: {comp_data['porosity_percentile']:.0f}%"
+        )
+        st.caption(f"vs. {comp_data['mean_commercial_porosity']:.4f} (avg)")
+    with col_comp3:
+        st.markdown("**Specific SA (m²/m³)**")
+        st.metric(
+            "Your Design",
+            f"{comp_data['user_specific_sa']:.1f}",
+            f"Percentile: {comp_data['ssa_percentile']:.0f}%"
+        )
+        st.caption(f"vs. {comp_data['mean_commercial_ssa']:.1f} (avg)")
+
+    st.markdown("#### Published Commercial Media Specifications")
+
+    # Build comparison table
+    comp_rows = []
+    comp_rows.append({
+        "Product": "🔵 YOUR DESIGN (Generated)",
+        "Manufacturer": design_type.replace('_', ' ').title(),
+        "Material": "CDMO",
+        "SA/V (mm⁻¹)": f"{comp_data['user_sav']:.4f}",
+        "Porosity": f"{comp_data['user_porosity']:.4f}",
+        "Specific SA (m²/m³)": f"{comp_data['user_specific_sa']:.1f}",
+        "Dimensions": f"{outer_diameter:.0f} x {height:.0f} mm",
+    })
+    for carrier in COMMERCIAL_CARRIERS:
+        comp_rows.append({
+            "Product": carrier.name,
+            "Manufacturer": carrier.manufacturer,
+            "Material": carrier.material,
+            "SA/V (mm⁻¹)": f"{carrier.sa_v_ratio:.4f}",
+            "Porosity": f"{carrier.porosity:.4f}",
+            "Specific SA (m²/m³)": f"{carrier.specific_surface_area:.1f}",
+            "Dimensions": carrier.dimensions_label,
+        })
+
+    import pandas as pd
+    comp_df = pd.DataFrame(comp_rows)
+    st.dataframe(comp_df, use_container_width=True, hide_index=True)
+
+    st.markdown("#### Detailed Specifications")
+    with st.expander("View commercial carrier details"):
+        col_detail = st.columns(1)[0]
+        with col_detail:
+            selected_product = st.selectbox(
+                "View detailed specs for:",
+                ["YOUR DESIGN"] + [c.name for c in COMMERCIAL_CARRIERS],
+                key="detail_select_gen"
+            )
+
+            if selected_product == "YOUR DESIGN":
+                st.markdown(f"**🔵 Your CDMO {design_type.title()} Design**")
+                det_cols = st.columns(4)
+                det_cols[0].metric("SA/V", f"{comp_data['user_sav']:.4f} mm⁻¹")
+                det_cols[1].metric("Porosity", f"{comp_data['user_porosity']:.4f}")
+                det_cols[2].metric("Specific SA", f"{comp_data['user_specific_sa']:.1f} m²/m³")
+                det_cols[3].metric("Material", "CDMO (custom)")
+                st.info(
+                    f"**Dimensions:** {outer_diameter}mm ⌀ × {height}mm H  \n"
+                    f"**Fins:** {num_fins} | **Rings:** {num_rings} | **Spikes:** {num_spikes}"
+                )
+            else:
+                carrier = next((c for c in COMMERCIAL_CARRIERS if c.name == selected_product), None)
+                if carrier:
+                    st.markdown(f"**{carrier.name}** — {carrier.manufacturer}")
+                    det_cols = st.columns(4)
+                    det_cols[0].metric("SA/V", f"{carrier.sa_v_ratio:.4f} mm⁻¹")
+                    det_cols[1].metric("Porosity", f"{carrier.porosity:.4f}")
+                    det_cols[2].metric("Specific SA", f"{carrier.specific_surface_area:.1f} m²/m³")
+                    det_cols[3].metric("Material", carrier.material)
+                    st.markdown(
+                        f"**Biofilm Affinity:** {carrier.biofilm_affinity:.2f}  \n"
+                        f"**Clogging Risk:** {carrier.clogging_risk}  \n"
+                        f"**Source Type:** {carrier.source_label}  \n"
+                        f"**Notes:** {carrier.notes}"
+                    )
+
+    st.markdown("#### Published MBBR Table (For Thesis/Publication)")
+    st.markdown(PUBLISHED_MBBR_TABLE_MD)
+    st.markdown("**References:**")
+    for ref in PUBLISHED_MBBR_REFERENCES:
+        st.markdown(f"- [{ref}]({ref})")

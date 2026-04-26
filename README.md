@@ -14,7 +14,8 @@
 ```powershell
 cd C:\Users\mubar\Projects\cdmo_app
 pip install -r requirements.txt
-streamlit run app.py
+.\.venv\Scripts\Activate.ps1
+streamlit run app.pycd
 ```
 
 App opens at <http://localhost:8501>
