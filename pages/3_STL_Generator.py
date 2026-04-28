@@ -24,7 +24,7 @@ from core.materials import FLUID_PROPERTIES
 from core.commercial_carriers import (
     COMMERCIAL_CARRIERS,
     compare_to_commercial,
-    PUBLISHED_MBBR_TABLE_MD,
+    build_published_mbbr_table_md,
     PUBLISHED_MBBR_REFERENCES,
 )
 
@@ -404,7 +404,7 @@ if "generated_geo" in st.session_state:
                     )
 
     st.markdown("#### Published MBBR Table (For Thesis/Publication)")
-    st.markdown(PUBLISHED_MBBR_TABLE_MD)
+    st.markdown(build_published_mbbr_table_md())
     st.markdown("**References:**")
     for ref in PUBLISHED_MBBR_REFERENCES:
         st.markdown(f"- [{ref}]({ref})")

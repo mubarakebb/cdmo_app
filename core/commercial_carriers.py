@@ -22,7 +22,13 @@ class CommercialCarrier:
     porosity: float
     biofilm_affinity: float
     clogging_risk: str
+    source_label: str = "Published commercial carrier"
     notes: str = ""
+
+    @property
+    def dimensions_label(self) -> str:
+        """Return a compact diameter x height display string."""
+        return f"{self.diameter_mm:.0f} x {self.height_mm:.0f} mm"
 
 
 REFERENCE_URLS: List[str] = [
@@ -30,6 +36,39 @@ REFERENCE_URLS: List[str] = [
     "http://technomaps.veoliawatertechnologies.com/anita/en/anita_mox.htm",
     "https://www.mbbr-media.com/product/mutagbiochip/",
 ]
+
+
+PUBLISHED_MBBR_REFERENCES: List[str] = REFERENCE_URLS
+
+
+PUBLISHED_MBBR_TABLE_MD = """
+| Carrier | Manufacturer | Material | Diameter (mm) | Height (mm) | SA/V (mm^-1) | Specific SA (m^2/m^3) | SA Basis | Density (g/cm^3) | Porosity | Biofilm Affinity | Clogging Risk |
+| --- | --- | --- | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | --- |
+| AnoxKaldnes K1 | AnoxKaldnes | HDPE | 10.0 | 7.0 | 0.0714 | 500.0 | effective | 0.96 | 0.85 | 0.75 | Medium |
+| AnoxKaldnes K3 | AnoxKaldnes | HDPE | 25.0 | 10.0 | 0.0500 | 500.0 | protected | 0.96 | 0.85 | 0.74 | Low |
+| AnoxKaldnes K5 | AnoxKaldnes | HDPE | 35.0 | 2.0 | 0.1143 | 800.0 | protected | 0.96 | 0.87 | 0.78 | Medium |
+| AnoxKaldnes BiofilmChip M | AnoxKaldnes | HDPE | 48.0 | 3.0 | 0.1667 | 1200.0 | protected | 0.96 | 0.90 | 0.80 | Medium |
+| Mutag BioChip | MUTAG | PE | 30.0 | 3.0 | 0.6111 | 5500.0 | active | 0.95 | 0.92 | 0.82 | Low |
+""".strip()
+
+
+def build_published_mbbr_table_md(carriers: List[CommercialCarrier] | None = None) -> str:
+    """Render the published carrier list as a markdown table."""
+    rows = carriers or COMMERCIAL_CARRIERS
+    header = (
+        "| Carrier | Manufacturer | Material | Diameter (mm) | Height (mm) | SA/V (mm^-1) | "
+        "Specific SA (m^2/m^3) | SA Basis | Density (g/cm^3) | Porosity | Biofilm Affinity | Clogging Risk |"
+    )
+    separator = "| --- | --- | --- | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | --- |"
+    lines = [header, separator]
+    for carrier in rows:
+        lines.append(
+            f"| {carrier.name} | {carrier.manufacturer} | {carrier.material} | {carrier.diameter_mm:.1f} | "
+            f"{carrier.height_mm:.1f} | {carrier.sa_v_ratio:.4f} | {carrier.specific_surface_area:.1f} | "
+            f"{carrier.sa_basis} | {carrier.density_g_cm3:.2f} | {carrier.porosity:.2f} | "
+            f"{carrier.biofilm_affinity:.2f} | {carrier.clogging_risk} |"
+        )
+    return "\n".join(lines)
 
 
 # Published commercial carrier data requested by user.

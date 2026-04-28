@@ -7,7 +7,7 @@ Uses Streamlit's `st.navigation` + `st.Page` to define sidebar labels/icons.
 import streamlit as st
 from utils.ui import inject_base_styles
 
-st.set_page_config(page_title="CDMO Framework", page_icon="🔬", layout="wide")
+st.set_page_config(page_title="CDMO Studio", page_icon="🔬", layout="wide")
 inject_base_styles()
 
 pages = [
