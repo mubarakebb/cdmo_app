@@ -223,7 +223,7 @@ def page_header(spec: HeaderSpec) -> None:
     )
 
 
-def sidebar_brand(*, title: str = "CDMO Framework", subtitle: str = "Computational Design & Multi‑Objective Optimization") -> None:
+def sidebar_brand(*, title: str = "CDMO Studio", subtitle: str = "Computational Design & Multi‑Objective Optimization") -> None:
     """Optional sidebar top branding block."""
     st.sidebar.markdown(
         f"""

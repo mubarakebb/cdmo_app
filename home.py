@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from utils.ui import inject_base_styles, sidebar_brand, cards_grid
 
 st.set_page_config(
-    page_title="CDMO Framework",
+    page_title="CDMO Studio",
     page_icon="🔬",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -27,7 +27,7 @@ st.markdown(
     <div class="cdmo-header" style="text-align:center;padding:2.4rem 2rem;">
       <div style="font-size:3rem;line-height:1;margin-bottom:0.65rem;">🔬</div>
       <div class="cdmo-badge" style="margin-bottom:0.6rem;">University of Ibadan · PhD Research</div>
-      <h1 class="cdmo-header__title" style="font-size:2.05rem;margin:0;">CDMO Framework</h1>
+      <h1 class="cdmo-header__title" style="font-size:2.05rem;margin:0;">CDMO Studio</h1>
       <p class="cdmo-header__subtitle" style="max-width:70ch;margin:0.55rem auto 0;">
         Computational Design &amp; Multi-Objective Optimization of 3D Printed Biofilm Carriers
         for Faecal Sludge Treatment
@@ -58,8 +58,8 @@ if st.session_state.get("all_carriers"):
     st.markdown("---")
 
 # Module cards
-st.markdown("### 📦 Framework Modules")
-st.caption("Navigate using the sidebar, or use this overview to plan your workflow.")
+st.markdown("### 📦 Core Modules")
+st.caption("Navigate using the sidebar or use this overview to plan your workflow.")
 
 cards_grid(
     [

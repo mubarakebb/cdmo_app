@@ -15,7 +15,7 @@
 cd C:\Users\mubar\Projects\cdmo_app
 pip install -r requirements.txt
 .\.venv\Scripts\Activate.ps1
-streamlit run app.pycd
+streamlit run app.py
 ```
 
 App opens at <http://localhost:8501>
