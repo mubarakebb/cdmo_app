@@ -23,28 +23,17 @@ st.markdown(
     """
     <style>
       /* Hide sidebar on auth pages */
-      [data-testid="stSidebar"]       { display: none !important; }
-      [data-testid="collapsedControl"] { display: none !important; }
+      [data-testid="stSidebar"]        { display: none !important; }
+      [data-testid="collapsedControl"]  { display: none !important; }
 
-      /* Full-screen auth shell */
+      /* Full-screen auth background */
       .stApp { background: var(--bg-secondary) !important; }
       .block-container {
         max-width: 100% !important;
-        padding: 0 !important;
+        padding: 2rem 1rem !important;
       }
 
-      /* ── Auth wrapper ── */
-      .auth-shell {
-        position: relative;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 1rem;
-        overflow: hidden;
-      }
-
-      /* Orb decorations */
+      /* ── Orb decorations ── */
       .auth-orb {
         position: fixed;
         border-radius: 50%;
@@ -71,24 +60,23 @@ st.markdown(
         animation: cdmo-drift 13s ease-in-out infinite alternate;
       }
 
-      /* ── Auth card ── */
+      /* ── Unified auth card (wraps brand header + form) ── */
       .auth-card {
         position: relative;
         z-index: 1;
         width: 100%;
-        max-width: 440px;
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: var(--radius-xl);
         box-shadow: var(--card-shadow-lg);
-        padding: 2.8rem 2.6rem 2.4rem;
-        margin: 0 auto;
+        padding: 2.6rem 2.4rem 0.5rem;
+        margin-bottom: 0;
       }
 
       /* ── Brand block ── */
       .auth-brand {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.8rem;
       }
       .auth-brand-icon {
         display: inline-flex;
@@ -129,7 +117,7 @@ st.markdown(
         font-size: 1.2rem;
         font-weight: 700;
         color: var(--text-primary);
-        margin: 0 0 1.6rem;
+        margin: 0 0 1.4rem;
         letter-spacing: -0.015em;
       }
 
@@ -137,7 +125,7 @@ st.markdown(
       .auth-divider {
         border: none;
         border-top: 1px solid var(--border);
-        margin: 0 0 1.75rem;
+        margin: 0 0 1.6rem;
       }
 
       /* ── Footer link ── */
@@ -145,8 +133,8 @@ st.markdown(
         text-align: center;
         font-size: 0.84rem;
         color: var(--text-muted);
-        margin-top: 1.4rem;
-        padding-top: 1.2rem;
+        margin-top: 0.8rem;
+        padding: 1rem 0 0.5rem;
         border-top: 1px solid var(--border);
       }
       .auth-footer a {
@@ -162,19 +150,38 @@ st.markdown(
         align-items: center;
         justify-content: center;
         gap: 1.5rem;
-        margin-top: 1.8rem;
+        margin-top: 1rem;
+        margin-bottom: 0.25rem;
         font-size: 0.75rem;
         color: var(--text-muted);
       }
-      .auth-trust-item {
-        display: flex;
-        align-items: center;
-        gap: 0.35rem;
-      }
-      .auth-trust-icon { font-size: 0.95rem; }
+      .auth-trust-item { display: flex; align-items: center; gap: 0.35rem; }
 
-      /* Primary button override for auth */
-      .auth-card .stButton > button[kind="primary"] {
+      /* ── Streamlit form cleanup inside the card ── */
+
+      /* Remove the "Press Enter to submit form" hint */
+      [data-testid="InputInstructions"] { display: none !important; }
+
+      /* Remove Streamlit's password show/hide eye toggle */
+      [data-testid="stTextInput"] button { display: none !important; }
+
+      /* Remove browser-native password reveal (Edge / Chrome) */
+      input[type="password"]::-ms-reveal            { display: none !important; }
+      input[type="password"]::-ms-clear             { display: none !important; }
+      input[type="password"]::-webkit-contacts-auto-fill-button { display: none !important; }
+      input[type="password"]::-webkit-credentials-auto-fill-button { display: none !important; }
+
+      /* Strip the form's own card styling so it blends into .auth-card */
+      [data-testid="stForm"] {
+        border: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+
+      /* Primary button */
+      [data-testid="stFormSubmitButton"] > button,
+      [data-testid="stFormSubmitButton"] > button[kind="primary"] {
         background: linear-gradient(135deg, var(--accent) 0%, var(--accent-indigo) 100%) !important;
         border: none !important;
         border-radius: var(--radius-pill) !important;
@@ -183,16 +190,17 @@ st.markdown(
         font-size: 0.95rem !important;
         font-weight: 600 !important;
         letter-spacing: -0.01em !important;
-        box-shadow: 0 4px 18px rgba(46,134,171,0.35) !important;
+        box-shadow: 0 4px 18px rgba(46,134,171,0.32) !important;
         transition: transform 0.2s, box-shadow 0.2s !important;
+        width: 100% !important;
       }
-      .auth-card .stButton > button[kind="primary"]:hover {
+      [data-testid="stFormSubmitButton"] > button:hover {
         transform: translateY(-2px) !important;
         box-shadow: 0 8px 28px rgba(46,134,171,0.42) !important;
       }
     </style>
 
-    <!-- Auth shell with orb decorations -->
+    <!-- Background orb decorations -->
     <div class="auth-orb auth-orb-1"></div>
     <div class="auth-orb auth-orb-2"></div>
     <div class="auth-orb auth-orb-3"></div>
@@ -200,27 +208,27 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ─── Card ─────────────────────────────────────────────────────────────────────
-st.markdown(
-    """
-    <div class="auth-card">
-      <div class="auth-brand">
-        <div class="auth-brand-icon">🔬</div>
-        <div class="auth-brand-title">CDMO Studio</div>
-        <div class="auth-brand-sub">Computational Design &amp; Multi-Objective Optimization</div>
-      </div>
-      <hr class="auth-divider">
-      <div class="auth-eyebrow">Welcome back</div>
-      <div class="auth-heading">Sign in to your account</div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# ─── Form (inside the same visual card via CSS positioning) ───────────────────
-_, col, _ = st.columns([1, 8, 1])
+# ─── Centred column — card header + form share the same width ─────────────────
+_, col, _ = st.columns([1, 6, 1])
 
 with col:
+    # Brand header (inside same column as form → same width)
+    st.markdown(
+        """
+        <div class="auth-card">
+          <div class="auth-brand">
+            <div class="auth-brand-icon">🔬</div>
+            <div class="auth-brand-title">CDMO Studio</div>
+            <div class="auth-brand-sub">Computational Design &amp; Multi-Objective Optimization</div>
+          </div>
+          <hr class="auth-divider">
+          <div class="auth-eyebrow">Welcome back</div>
+          <div class="auth-heading">Sign in to your account</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     with st.form("login_form", clear_on_submit=False):
         username = st.text_input(
             "Username",
@@ -259,15 +267,9 @@ with col:
           <a href="/auth/signup" target="_self">Create one free →</a>
         </div>
         <div class="auth-trust">
-          <div class="auth-trust-item">
-            <span class="auth-trust-icon">🔒</span> Secure login
-          </div>
-          <div class="auth-trust-item">
-            <span class="auth-trust-icon">🎓</span> Research-grade
-          </div>
-          <div class="auth-trust-item">
-            <span class="auth-trust-icon">⚡</span> Instant access
-          </div>
+          <div class="auth-trust-item">🔒 Secure login</div>
+          <div class="auth-trust-item">🎓 Research-grade</div>
+          <div class="auth-trust-item">⚡ Instant access</div>
         </div>
         """,
         unsafe_allow_html=True,
