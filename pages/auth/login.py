@@ -129,12 +129,16 @@ st.markdown(
         padding: 1rem 0 0.5rem;
         border-top: 1px solid var(--border);
       }
-      .auth-footer a {
-        color: var(--accent);
-        text-decoration: none;
-        font-weight: 600;
+      /* st.page_link styled as footer link */
+      .auth-footer [data-testid="stPageLink"] a,
+      .auth-footer-nav [data-testid="stPageLink"] a {
+        color: var(--accent) !important;
+        font-size: 0.84rem !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
       }
-      .auth-footer a:hover { text-decoration: underline; }
+      .auth-footer-nav [data-testid="stPageLink"] a:hover { text-decoration: underline !important; }
+      .auth-footer-nav { text-align: center; margin-top: 0.5rem; }
 
       /* ── Trust badge strip ── */
       .auth-trust {
@@ -251,10 +255,16 @@ with col:
 
     st.markdown(
         """
-        <div class="auth-footer">
-          Don't have an account?&nbsp;
-          <a href="/auth/signup" target="_self">Create one free →</a>
-        </div>
+        <div class="auth-footer">Don't have an account?</div>
+        """,
+        unsafe_allow_html=True,
+    )
+    # st.page_link is the only Streamlit-native way to navigate between pages
+    st.markdown('<div class="auth-footer-nav">', unsafe_allow_html=True)
+    st.page_link("pages/auth/signup.py", label="Create one free →")
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown(
+        """
         <div class="auth-trust">
           <div class="auth-trust-item">🔒 Secure login</div>
           <div class="auth-trust-item">🎓 Research-grade</div>

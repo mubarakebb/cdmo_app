@@ -153,12 +153,15 @@ st.markdown(
         padding-top: 1.2rem;
         border-top: 1px solid var(--border);
       }
-      .auth-footer a {
-        color: var(--accent-teal);
-        text-decoration: none;
-        font-weight: 600;
+      /* st.page_link styled as footer link */
+      .auth-footer-nav [data-testid="stPageLink"] a {
+        color: var(--accent-teal) !important;
+        font-size: 0.84rem !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
       }
-      .auth-footer a:hover { text-decoration: underline; }
+      .auth-footer-nav [data-testid="stPageLink"] a:hover { text-decoration: underline !important; }
+      .auth-footer-nav { text-align: center; margin-top: 0.5rem; }
 
       /* Remove "Press Enter to submit form" hint */
       [data-testid="InputInstructions"] { display: none !important; }
@@ -305,11 +308,9 @@ with col:
                 st.error(str(e))
 
     st.markdown(
-        """
-        <div class="auth-footer">
-          Already have an account?&nbsp;
-          <a href="/auth/login" target="_self">Sign in instead →</a>
-        </div>
-        """,
+        '<div class="auth-footer">Already have an account?</div>',
         unsafe_allow_html=True,
     )
+    st.markdown('<div class="auth-footer-nav">', unsafe_allow_html=True)
+    st.page_link("pages/auth/login.py", label="Sign in instead →")
+    st.markdown('</div>', unsafe_allow_html=True)
