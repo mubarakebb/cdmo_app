@@ -6,14 +6,6 @@ import streamlit as st
 from utils.auth import register_user, login_user, is_authenticated, AuthError
 from utils.ui import inject_base_styles
 
-st.set_page_config(
-    page_title="Sign Up — CDMO Studio",
-    page_icon="🔬",
-    layout="centered",
-)
-
-inject_base_styles()
-
 # Already logged in → go straight to home
 if is_authenticated():
     st.switch_page("home.py")
@@ -171,10 +163,7 @@ st.markdown(
       /* Remove "Press Enter to submit form" hint */
       [data-testid="InputInstructions"] { display: none !important; }
 
-      /* Remove Streamlit's password show/hide eye toggle */
-      [data-testid="stTextInput"] button { display: none !important; }
-
-      /* Remove browser-native password reveal icons */
+      /* Hide ONLY the browser-native password reveal (keeps Streamlit's single toggle) */
       input[type="password"]::-ms-reveal            { display: none !important; }
       input[type="password"]::-ms-clear             { display: none !important; }
       input[type="password"]::-webkit-contacts-auto-fill-button { display: none !important; }
