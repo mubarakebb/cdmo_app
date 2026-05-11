@@ -28,7 +28,7 @@ st.markdown(
       .stApp { background: var(--bg-secondary) !important; }
       .block-container {
         max-width: 100% !important;
-        padding: 0 !important;
+        padding: 2rem 1rem !important;
       }
 
       /* ── Orbs ── */
@@ -58,18 +58,17 @@ st.markdown(
         animation: cdmo-drift 14s ease-in-out infinite alternate;
       }
 
-      /* ── Card ── */
+      /* ── Card — fills the column (no fixed max-width) ── */
       .auth-card {
         position: relative;
         z-index: 1;
         width: 100%;
-        max-width: 480px;
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: var(--radius-xl);
         box-shadow: var(--card-shadow-lg);
-        padding: 2.6rem 2.5rem 2.2rem;
-        margin: 0 auto;
+        padding: 2.6rem 2.5rem 0.5rem;
+        margin-bottom: 0;
       }
 
       /* ── Brand ── */
@@ -169,8 +168,29 @@ st.markdown(
       }
       .auth-footer a:hover { text-decoration: underline; }
 
-      /* Primary button */
-      .auth-card .stButton > button[kind="primary"] {
+      /* Remove "Press Enter to submit form" hint */
+      [data-testid="InputInstructions"] { display: none !important; }
+
+      /* Remove Streamlit's password show/hide eye toggle */
+      [data-testid="stTextInput"] button { display: none !important; }
+
+      /* Remove browser-native password reveal icons */
+      input[type="password"]::-ms-reveal            { display: none !important; }
+      input[type="password"]::-ms-clear             { display: none !important; }
+      input[type="password"]::-webkit-contacts-auto-fill-button { display: none !important; }
+      input[type="password"]::-webkit-credentials-auto-fill-button { display: none !important; }
+
+      /* Strip the form's own box so it blends into .auth-card */
+      [data-testid="stForm"] {
+        border: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+
+      /* Primary submit button */
+      [data-testid="stFormSubmitButton"] > button,
+      [data-testid="stFormSubmitButton"] > button[kind="primary"] {
         background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-indigo) 100%) !important;
         border: none !important;
         border-radius: var(--radius-pill) !important;
@@ -181,8 +201,9 @@ st.markdown(
         letter-spacing: -0.01em !important;
         box-shadow: 0 4px 18px rgba(20,184,166,0.32) !important;
         transition: transform 0.2s, box-shadow 0.2s !important;
+        width: 100% !important;
       }
-      .auth-card .stButton > button[kind="primary"]:hover {
+      [data-testid="stFormSubmitButton"] > button:hover {
         transform: translateY(-2px) !important;
         box-shadow: 0 8px 28px rgba(20,184,166,0.42) !important;
       }
@@ -195,33 +216,33 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ─── Card header ──────────────────────────────────────────────────────────────
-st.markdown(
-    """
-    <div class="auth-card">
-      <div class="auth-brand">
-        <div class="auth-brand-icon">🔬</div>
-        <div class="auth-brand-title">CDMO Studio</div>
-        <div class="auth-brand-sub">Computational Design &amp; Multi-Objective Optimization</div>
-      </div>
-      <hr class="auth-divider">
-      <div class="auth-eyebrow">Get started for free</div>
-      <div class="auth-heading">Create your account</div>
-      <div class="auth-benefits">
-        <span class="auth-benefit-pill">🧬 NSGA-II Optimiser</span>
-        <span class="auth-benefit-pill">📊 Statistical Analysis</span>
-        <span class="auth-benefit-pill">🖨️ STL Generator</span>
-        <span class="auth-benefit-pill">📄 PDF Reports</span>
-      </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# ─── Form ─────────────────────────────────────────────────────────────────────
-_, col, _ = st.columns([1, 8, 1])
+# ─── Centred column — card header + form share the same width ─────────────────
+_, col, _ = st.columns([1, 6, 1])
 
 with col:
+    # Brand header (same column = same width as form)
+    st.markdown(
+        """
+        <div class="auth-card">
+          <div class="auth-brand">
+            <div class="auth-brand-icon">🔬</div>
+            <div class="auth-brand-title">CDMO Studio</div>
+            <div class="auth-brand-sub">Computational Design &amp; Multi-Objective Optimization</div>
+          </div>
+          <hr class="auth-divider">
+          <div class="auth-eyebrow">Get started for free</div>
+          <div class="auth-heading">Create your account</div>
+          <div class="auth-benefits">
+            <span class="auth-benefit-pill">🧬 NSGA-II Optimiser</span>
+            <span class="auth-benefit-pill">📊 Statistical Analysis</span>
+            <span class="auth-benefit-pill">🖨️ STL Generator</span>
+            <span class="auth-benefit-pill">📄 PDF Reports</span>
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     with st.form("signup_form", clear_on_submit=False):
         c1, c2 = st.columns(2)
         with c1:
