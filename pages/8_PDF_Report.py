@@ -4,8 +4,8 @@ Generate automated thesis-quality PDF reports from analysis results.
 """
 
 import streamlit as st
-import os, sys, tempfile
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+import os
+import tempfile
 
 from utils.ui import HeaderSpec, page_header, sidebar_brand
 

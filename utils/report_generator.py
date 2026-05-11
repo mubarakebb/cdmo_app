@@ -6,7 +6,6 @@ Includes summary statistics, rankings, Pareto findings, and all charts.
 
 import io
 import os
-import sys
 import tempfile
 from datetime import datetime
 from typing import List, Dict
@@ -16,12 +15,10 @@ from fpdf import FPDF
 import plotly.graph_objects as go
 import plotly.express as px
 
+
 def _safe(text: str) -> str:
     """Strip non-latin-1 chars so fpdf2 core fonts never error."""
     return text.encode('latin-1', errors='replace').decode('latin-1')
-
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 
 class CDMOReport(FPDF):

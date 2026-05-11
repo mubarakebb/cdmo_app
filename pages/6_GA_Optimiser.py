@@ -9,12 +9,12 @@ import plotly.express as px
 import pandas as pd
 import numpy as np
 import io
+import os
+import tempfile
 import trimesh
-import sys, os, tempfile
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from utils.ui import HeaderSpec, page_header, sidebar_brand
+from utils.persistence import save_ga_result, load_ga_result, list_ga_results
 
 from core.genetic_algorithm import (
     run_genetic_algorithm, ga_result_to_dataframe,
@@ -135,9 +135,54 @@ with st.sidebar:
                         help="More generations = better results, slower run")
     pop_sz = st.select_slider("Population Size", [8, 12, 16, 20, 24, 30], value=16,
                                help="Must be even")
+    use_seed = st.checkbox("Fix random seed (reproducible)", value=False,
+                            help="Enable to get identical results across runs (useful for thesis reproducibility)")
+    random_seed = st.number_input("Seed value", min_value=0, max_value=99999,
+                                   value=42, step=1) if use_seed else None
 
     st.info(f"~{n_gen * pop_sz * 2} STL evaluations total")
     run_btn = st.button("🧬 Run Optimisation", type="primary", use_container_width=True)
+
+    st.markdown("---")
+    st.markdown("### 💾 Session")
+    save_name = st.text_input("Save name", value="ga_run", key="ga_save_name")
+    save_btn = st.button("💾 Save GA Result", use_container_width=True,
+                          disabled="ga_result" not in st.session_state)
+
+    st.markdown("**Load previous run:**")
+    saved_ga = list_ga_results()
+    if saved_ga:
+        load_sel = st.selectbox(
+            "Saved GA results",
+            ["— select —"] + [f"{s['session_name']} ({s['design_type']}, {s['material']}, "
+                               f"gen={s['n_generations']}, pareto={s['pareto_size']})"
+                               for s in saved_ga],
+            key="ga_load_sel",
+        )
+        load_btn = st.button("📂 Load", use_container_width=True,
+                              disabled=(load_sel == "— select —"))
+    else:
+        load_btn = False
+        load_sel = None
+
+# ─── Save / Load handlers ─────────────────────────────────────────────────────
+if save_btn and "ga_result" in st.session_state:
+    try:
+        path = save_ga_result(st.session_state.ga_result, save_name)
+        st.sidebar.success(f"Saved: {os.path.basename(path)}")
+    except Exception as e:
+        st.sidebar.error(f"Save failed: {e}")
+
+if load_btn and saved_ga and load_sel != "— select —":
+    idx = [f"{s['session_name']} ({s['design_type']}, {s['material']}, "
+           f"gen={s['n_generations']}, pareto={s['pareto_size']})"
+           for s in saved_ga].index(load_sel)
+    try:
+        st.session_state.ga_result = load_ga_result(saved_ga[idx]["filepath"])
+        st.sidebar.success("GA result loaded.")
+        st.rerun()
+    except Exception as e:
+        st.sidebar.error(f"Load failed: {e}")
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
 if run_btn:
@@ -163,6 +208,7 @@ if run_btn:
                 flow_velocity=flow_velocity,
                 weights=weights,
                 progress_callback=update_progress,
+                random_seed=random_seed,
             )
         progress_bar.progress(1.0)
         status.text("✅ Optimisation complete!")
@@ -315,9 +361,12 @@ if result.pareto_front:
     with col_dl:
         try:
             stl_path, _ = generate_carrier_stl(selected_ind.params)
-            with open(stl_path, "rb") as f:
-                stl_bytes = f.read()
-            os.unlink(stl_path)
+            try:
+                with open(stl_path, "rb") as f:
+                    stl_bytes = f.read()
+            finally:
+                if os.path.exists(stl_path):
+                    os.unlink(stl_path)
 
             fname = (f"ga_optimised_{design_type}_"
                      f"D{int(selected_ind.params.outer_diameter)}"

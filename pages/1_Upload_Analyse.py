@@ -14,14 +14,11 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import tempfile
 import os
-import sys
-
-sys.path.insert(0, os.path.dirname(__file__))
 
 from utils.ui import HeaderSpec, page_header, sidebar_brand
 
-from core.geometry import analyze_stl, get_metrics_summary
-from core.flow_analysis import compute_flow_metrics, get_flow_summary
+from core.geometry import analyze_stl, GeometryMetrics, get_metrics_summary
+from core.flow_analysis import compute_flow_metrics, FlowMetrics, get_flow_summary
 from core.buoyancy import compute_buoyancy, compare_materials_buoyancy, get_buoyancy_summary
 from core.scoring import (
     ObjectiveWeights, CarrierScore, score_carrier,
@@ -29,6 +26,72 @@ from core.scoring import (
     generate_improvement_suggestions, get_ranking_summary
 )
 from core.materials import MATERIALS, FLUID_PROPERTIES
+
+
+# ─── Cached analysis helpers ──────────────────────────────────────────────────
+
+@st.cache_data(show_spinner=False)
+def cached_analyze_stl(file_bytes: bytes, filename: str) -> GeometryMetrics:
+    """Cache geometry analysis keyed on file content so re-renders don't re-parse STL."""
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".stl") as tmp:
+        tmp.write(file_bytes)
+        tmp_path = tmp.name
+    try:
+        geo = analyze_stl(tmp_path)
+        geo.filename = filename
+        return geo
+    finally:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+
+
+@st.cache_data(show_spinner=False)
+def cached_flow_metrics(
+    porosity: float, hydraulic_diameter: float,
+    specific_surface_area: float, sav_ratio: float,
+    surface_area: float, volume: float, bounding_box_volume: float,
+    superficial_velocity: float, fluid_density: float,
+    fluid_viscosity: float, temperature: float,
+) -> FlowMetrics:
+    """Cache flow metrics keyed on geometry + operating conditions."""
+    geo = GeometryMetrics(
+        porosity=porosity,
+        hydraulic_diameter=hydraulic_diameter,
+        specific_surface_area=specific_surface_area,
+        sav_ratio=sav_ratio,
+        surface_area=surface_area,
+        volume=volume,
+        bounding_box_volume=bounding_box_volume,
+    )
+    return compute_flow_metrics(
+        geo, superficial_velocity, fluid_density, fluid_viscosity, temperature
+    )
+
+
+@st.cache_data(show_spinner=False)
+def _porosity_flow_curve(
+    base_sav: float, base_surface_area: float, base_volume: float,
+    base_bb_volume: float, base_porosity: float, base_hd: float,
+    base_ssa: float,
+    flow_velocity: float, fluid_density: float, fluid_viscosity: float,
+) -> tuple:
+    """Pre-compute the 50-point porosity-vs-flow-efficiency curve once per design."""
+    porosities = np.linspace(0.3, 0.95, 50)
+    flow_eff_values = []
+    for por in porosities:
+        geo_temp = GeometryMetrics(
+            porosity=por,
+            sav_ratio=base_sav,
+            surface_area=base_surface_area,
+            volume=base_volume * (1 - por) / max(1 - base_porosity, 1e-6),
+            bounding_box_volume=base_bb_volume,
+            specific_surface_area=base_ssa,
+            hydraulic_diameter=base_hd * por / max(base_porosity, 1e-6),
+        )
+        f_temp = compute_flow_metrics(geo_temp, flow_velocity, fluid_density, fluid_viscosity)
+        flow_eff_values.append(f_temp.flow_efficiency_score)
+    return porosities, np.array(flow_eff_values)
+
 
 # ─── Page Configuration ───────────────────────────────────────────────────────
 st.set_page_config(
@@ -214,27 +277,17 @@ with tab1:
             step = 0
             
             for uploaded_file in uploaded_files:
-                # Save to temp file
-                with tempfile.NamedTemporaryFile(
-                    delete=False, suffix=".stl",
-                    prefix=uploaded_file.name.replace(".stl", "_")
-                ) as tmp:
-                    tmp.write(uploaded_file.getvalue())
-                    tmp_path = tmp.name
-                
                 try:
-                    # Geometry analysis (once per file)
+                    # Geometry analysis (cached by file content)
                     status_text.text(f"⚙️ Analyzing geometry: {uploaded_file.name}")
-                    geo = analyze_stl(tmp_path)
-                    geo.filename = uploaded_file.name
-                    
-                    # Flow analysis (once per file, same geometry)
-                    flow = compute_flow_metrics(
-                        geo,
-                        superficial_velocity=flow_velocity,
-                        fluid_density=fluid_density,
-                        fluid_viscosity=fluid_viscosity,
-                        temperature=temperature
+                    geo = cached_analyze_stl(uploaded_file.getvalue(), uploaded_file.name)
+
+                    # Flow analysis (cached by geometry + conditions)
+                    flow = cached_flow_metrics(
+                        geo.porosity, geo.hydraulic_diameter,
+                        geo.specific_surface_area, geo.sav_ratio,
+                        geo.surface_area, geo.volume, geo.bounding_box_volume,
+                        flow_velocity, fluid_density, fluid_viscosity, temperature,
                     )
                     
                     # Per-material analysis
@@ -263,8 +316,6 @@ with tab1:
                 
                 except Exception as e:
                     st.error(f"❌ Error processing {uploaded_file.name}: {str(e)}")
-                finally:
-                    os.unlink(tmp_path)
             
             # Population-level scoring and Pareto analysis
             if new_carriers:
@@ -713,10 +764,9 @@ with tab4:
         with col_left:
             st.markdown("#### Velocity vs Pressure Drop (Ergun Curve)")
             velocities = np.linspace(0.001, 0.1, 50)
-            from core.flow_analysis import compute_flow_metrics as cfm
             pressure_drops = []
             for v in velocities:
-                f_temp = cfm(geo, v, fluid_density, fluid_viscosity)
+                f_temp = compute_flow_metrics(geo, v, fluid_density, fluid_viscosity)
                 pressure_drops.append(f_temp.pressure_drop_per_m)
             
             fig_pd = go.Figure()
@@ -744,21 +794,12 @@ with tab4:
         
         with col_right:
             st.markdown("#### Porosity vs Flow Efficiency")
-            porosities = np.linspace(0.3, 0.95, 50)
-            from core.geometry import GeometryMetrics
-            flow_eff_values = []
-            for por in porosities:
-                # Create synthetic geometry for sensitivity analysis
-                geo_temp = GeometryMetrics()
-                geo_temp.porosity = por
-                geo_temp.sav_ratio = geo.sav_ratio
-                geo_temp.surface_area = geo.surface_area
-                geo_temp.volume = geo.volume * (1 - por) / (1 - geo.porosity)
-                geo_temp.bounding_box_volume = geo.bounding_box_volume
-                geo_temp.specific_surface_area = geo.specific_surface_area
-                geo_temp.hydraulic_diameter = geo.hydraulic_diameter * por / geo.porosity
-                f_temp = cfm(geo_temp, flow_velocity, fluid_density, fluid_viscosity)
-                flow_eff_values.append(f_temp.flow_efficiency_score)
+            porosities, flow_eff_values = _porosity_flow_curve(
+                geo.sav_ratio, geo.surface_area, geo.volume,
+                geo.bounding_box_volume, geo.porosity,
+                geo.hydraulic_diameter, geo.specific_surface_area,
+                flow_velocity, fluid_density, fluid_viscosity,
+            )
             
             fig_fe = go.Figure()
             fig_fe.add_trace(go.Scatter(

@@ -4,6 +4,8 @@ Processes STL files to extract all geometric performance metrics
 for biofilm carrier evaluation.
 """
 
+import os
+
 import numpy as np
 import trimesh
 from dataclasses import dataclass, field
@@ -131,7 +133,7 @@ def analyze_stl(filepath: str, unit: str = "mm") -> GeometryMetrics:
         GeometryMetrics dataclass with all computed values
     """
     metrics = GeometryMetrics()
-    metrics.filename = filepath.split("/")[-1]
+    metrics.filename = os.path.basename(filepath)
     
     # Load and validate
     mesh, issues = load_and_validate_stl(filepath)
