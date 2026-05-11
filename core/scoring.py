@@ -5,6 +5,8 @@ Implements weighted scoring and Pareto optimality identification
 for comparing biofilm carrier designs across competing objectives.
 """
 
+import copy
+
 import numpy as np
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional
@@ -144,10 +146,15 @@ def compute_composite_scores(
     Normalize all scores across the population and compute weighted composite scores.
     This must be called after ALL carriers have been scored, so normalization
     reflects the full design space being evaluated.
+
+    Note: ``weights`` is never mutated — a normalised copy is used internally so
+    the caller's object is always preserved.
     """
     if not carriers:
         return carriers
-    
+
+    # Work on a copy so the caller's weights object is never mutated
+    weights = copy.copy(weights)
     weights.normalize()
     
     # Extract raw values for population-level normalization

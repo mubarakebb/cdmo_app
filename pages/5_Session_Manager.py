@@ -6,10 +6,7 @@ Avoids re-uploading all 16 STL files every session.
 
 import streamlit as st
 import pandas as pd
-import sys
 import os
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from utils.ui import HeaderSpec, page_header, sidebar_brand
 

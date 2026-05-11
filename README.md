@@ -12,9 +12,19 @@
 ## Quick Start
 
 ```powershell
-cd C:\Users\mubar\Projects\cdmo_app
+# Clone / navigate to the project directory
+cd <path-to-cdmo_app>
+
+# Install as editable package (recommended — avoids sys.path hacks)
+pip install -e ".[dev]"
+
+# Or install only runtime deps
 pip install -r requirements.txt
-.\.venv\Scripts\Activate.ps1
+
+# (Optional) activate virtual environment
+.\.venv\Scripts\Activate.ps1   # Windows PowerShell
+# source .venv/bin/activate     # macOS / Linux
+
 streamlit run app.py
 ```
 
@@ -117,6 +127,20 @@ PP       | 0.90-0.91     | 0.60             | Very High (best)
 
 ## Requirements
 
+All dependencies are declared in `pyproject.toml`.
+
+```
 streamlit>=1.32.0, trimesh>=4.3.0, numpy>=1.26.0, scipy>=1.12.0,
-plotly>=5.19.0, pandas>=2.2.0, numpy-stl>=3.1.0, fpdf2>=2.7.0, kaleido>=0.2.1,
-networkx>=3.2.1
+plotly>=5.19.0, pandas>=2.2.0, numpy-stl>=3.1.0, fpdf2>=2.7.0,
+kaleido>=0.2.1, networkx>=3.2.1
+```
+
+Dev / testing extras (installed with `pip install -e ".[dev]"`):
+```
+pytest>=8.0, pytest-cov>=5.0
+```
+
+Run tests:
+```powershell
+pytest tests/
+```

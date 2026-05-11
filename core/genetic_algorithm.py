@@ -18,10 +18,8 @@ from dataclasses import dataclass, field
 from typing import List, Tuple, Dict, Callable
 import copy
 import os
-import sys
 import tempfile
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from contextlib import contextmanager
 
 from core.stl_generator import CarrierParams, generate_carrier_stl
 from core.geometry import analyze_stl
@@ -128,50 +126,91 @@ def random_individual(design_type: str = "cross_flow") -> Individual:
     return ind
 
 
+@contextmanager
+def _tmp_stl(params):
+    """Context manager that generates a carrier STL, yields the path, then always deletes it."""
+    path = None
+    try:
+        path, _ = generate_carrier_stl(params)
+        yield path
+    finally:
+        if path and os.path.exists(path):
+            os.unlink(path)
+
+
 def evaluate_individual(
     ind: Individual,
     material: str,
     fluid_density: float,
     fluid_viscosity: float,
     flow_velocity: float,
-    weights: Dict[str, float]
+    weights: Dict[str, float],
+    sav_population_max: float = 0.0,
 ) -> Individual:
     """
     Evaluate a single individual by generating its STL and computing all objectives.
     Marks infeasible if generation or analysis fails.
+
+    Parameters:
+        sav_population_max: Running maximum SA/V across the current population used
+            for dynamic normalisation.  Pass 0.0 (default) to skip normalisation
+            (raw value capped at 1.0 via min()).
     """
-    tmp_path = None
     try:
-        tmp_path, _ = generate_carrier_stl(ind.params)
-        from core.geometry import analyze_stl as _analyze
-        geo = _analyze(tmp_path)
-        
+        with _tmp_stl(ind.params) as tmp_path:
+            from core.geometry import analyze_stl as _analyze
+            geo = _analyze(tmp_path)
+
         # Sanity checks — reject degenerate geometries
         if geo.porosity < 0.20 or geo.porosity > 0.97:
             ind.feasible = False
             ind.error = f"Porosity {geo.porosity:.2f} out of feasible range"
             return ind
-        
+
         if geo.sav_ratio <= 0 or geo.volume <= 0:
             ind.feasible = False
             ind.error = "Zero or negative SA/V or volume"
             return ind
-        
+
         flow = compute_flow_metrics(geo, flow_velocity, fluid_density, fluid_viscosity)
         buoy = compute_buoyancy(geo, material, fluid_density)
-        
+
+        # Material scores (fixed per material — same as scoring.py)
+        from core.materials import MATERIALS as _MATS
+        mat_data = _MATS.get(material, {})
+        biofilm_score  = float(mat_data.get("biofilm_affinity_score", 0.0))
+        mechanical_score = float(mat_data.get("mechanical_score", 0.0))
+
         # Store objectives (all maximised)
         ind.obj_sav      = geo.sav_ratio
         ind.obj_porosity = geo.porosity
         ind.obj_flow     = flow.flow_efficiency_score
         ind.obj_buoyancy = buoy.buoyancy_score
-        
+
+        # Dynamic SAV normalisation: use population max if available, else cap at 1.0
+        if sav_population_max > 0:
+            norm_sav = min(1.0, geo.sav_ratio / sav_population_max)
+        else:
+            norm_sav = min(1.0, geo.sav_ratio)
+
+        # All six objectives — consistent with scoring.py ObjectiveWeights
+        w_total = (
+            weights.get("sav_ratio", 0.30)
+            + weights.get("porosity", 0.20)
+            + weights.get("flow_efficiency", 0.20)
+            + weights.get("buoyancy", 0.15)
+            + weights.get("biofilm_affinity", 0.10)
+            + weights.get("mechanical", 0.05)
+        ) or 1.0  # guard against all-zero weights
+
         ind.composite_score = (
-            weights.get("sav_ratio", 0.30)      * min(1.0, geo.sav_ratio / 5.0) +
-            weights.get("porosity", 0.20)        * geo.porosity +
-            weights.get("flow_efficiency", 0.20) * flow.flow_efficiency_score +
-            weights.get("buoyancy", 0.15)        * buoy.buoyancy_score
-        )
+            weights.get("sav_ratio", 0.30)       * norm_sav +
+            weights.get("porosity", 0.20)         * geo.porosity +
+            weights.get("flow_efficiency", 0.20)  * flow.flow_efficiency_score +
+            weights.get("buoyancy", 0.15)         * buoy.buoyancy_score +
+            weights.get("biofilm_affinity", 0.10) * biofilm_score +
+            weights.get("mechanical", 0.05)       * mechanical_score
+        ) / w_total
         
         ind.geo_metrics = {
             "sav_ratio": geo.sav_ratio,
@@ -199,10 +238,7 @@ def evaluate_individual(
     except Exception as e:
         ind.feasible = False
         ind.error = str(e)
-    finally:
-        if tmp_path and os.path.exists(tmp_path):
-            os.unlink(tmp_path)
-    
+
     return ind
 
 
@@ -396,10 +432,11 @@ def run_genetic_algorithm(
     weights: Dict[str, float] = None,
     progress_callback: Callable = None,
     seed_params: CarrierParams = None,
+    random_seed: int = None,
 ) -> GAResult:
     """
     Run NSGA-II multi-objective genetic algorithm to optimise carrier geometry.
-    
+
     Parameters:
         n_generations: Number of generations to evolve
         population_size: Must be even; typical values 10-30 for speed
@@ -407,15 +444,21 @@ def run_genetic_algorithm(
         material: Material for buoyancy and affinity scoring
         progress_callback: Optional function(gen, total, best_score) for UI updates
         seed_params: Optional starting design to seed the initial population
-    
+        random_seed: Optional integer seed for reproducible runs (None = random).
+
     Returns:
         GAResult with Pareto front and convergence history
     """
     if weights is None:
-        weights = {"sav_ratio": 0.30, "porosity": 0.20,
-                   "flow_efficiency": 0.20, "buoyancy": 0.15}
-    
-    np.random.seed(42)
+        weights = {
+            "sav_ratio": 0.30, "porosity": 0.20,
+            "flow_efficiency": 0.20, "buoyancy": 0.15,
+            "biofilm_affinity": 0.10, "mechanical": 0.05,
+        }
+
+    if random_seed is not None:
+        np.random.seed(random_seed)
+
     result = GAResult(design_type=design_type, material=material,
                       n_generations=n_generations)
     
@@ -432,12 +475,16 @@ def run_genetic_algorithm(
             ind = random_individual(design_type)
         population.append(ind)
     
-    # Evaluate initial population
+    # Evaluate initial population (first pass — no SAV max yet)
     for i, ind in enumerate(population):
         population[i] = evaluate_individual(
             ind, material, fluid_density, fluid_viscosity, flow_velocity, weights)
         if progress_callback:
             progress_callback(0, n_generations, i / population_size * 0.1)
+
+    # Compute population-level SAV max for dynamic normalisation in subsequent evals
+    feasible_sav = [ind.obj_sav for ind in population if ind.feasible and ind.obj_sav > 0]
+    sav_pop_max = max(feasible_sav) if feasible_sav else 0.0
     
     # Remove infeasible
     population = [ind for ind in population if ind.feasible]
@@ -483,9 +530,11 @@ def run_genetic_algorithm(
             c2 = polynomial_mutation(c2, design_type=design_type)
             
             c1 = evaluate_individual(
-                c1, material, fluid_density, fluid_viscosity, flow_velocity, weights)
+                c1, material, fluid_density, fluid_viscosity, flow_velocity, weights,
+                sav_population_max=sav_pop_max)
             c2 = evaluate_individual(
-                c2, material, fluid_density, fluid_viscosity, flow_velocity, weights)
+                c2, material, fluid_density, fluid_viscosity, flow_velocity, weights,
+                sav_population_max=sav_pop_max)
             
             if c1.feasible:
                 offspring.append(c1)
@@ -519,6 +568,11 @@ def run_genetic_algorithm(
         population = next_population
         if len(population) < 4:
             break
+
+        # Update SAV max for next generation
+        gen_sav = [ind.obj_sav for ind in population if ind.feasible and ind.obj_sav > 0]
+        if gen_sav:
+            sav_pop_max = max(sav_pop_max, max(gen_sav))
     
     # Final Pareto front
     fronts = non_dominated_sort(population)

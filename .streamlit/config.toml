@@ -1,14 +1,13 @@
 [theme]
-# A clean, thesis-friendly palette (works well with Plotly too)
-primaryColor = "#2E86AB"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F6F8FB"
-textColor = "#0F172A"
-font = "sans serif"
+# Folio design system palette — matches utils/ui.py design tokens
+primaryColor       = "#2E86AB"
+backgroundColor    = "#ffffff"
+secondaryBackgroundColor = "#f8f9fb"
+textColor          = "#0d0f1a"
+font               = "sans serif"
 
 [client]
 toolbarMode = "minimal"
 
 [ui]
 hideTopBar = true
-

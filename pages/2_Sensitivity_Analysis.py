@@ -8,10 +8,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 import numpy as np
-import sys
 import os
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from utils.ui import HeaderSpec, page_header, sidebar_brand
 
