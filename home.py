@@ -25,7 +25,7 @@ hero_html = """<div style="position:relative;overflow:hidden;padding:3rem 2.5rem
       Computational Design &<br><span style="background:linear-gradient(135deg,#2E86AB,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Multi-Objective Optimization</span>
     </h1>
     <p class="cdmo-reveal cdmo-reveal-3" style="font-size:1.05rem;color:rgba(255,255,255,0.62);max-width:560px;line-height:1.65;margin:0 0 2rem;">
-      Evaluate, compare and evolve 3D-printed biofilm carriers for faecal sludge treatment — geometry analysis, flow simulation, NSGA-II optimisation and automated thesis reporting in one platform.
+      Evaluate, compare and evolve 3D-printed biofilm carriers for faecal sludge treatment through geometry analysis, flow simulation, NSGA-II optimisation and automated thesis reporting in one platform.
     </p>
     <div class="cdmo-reveal cdmo-reveal-4" style="display:flex;flex-wrap:wrap;gap:0.6rem;">
       <span style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.35rem 0.85rem;border-radius:var(--radius-pill);background:rgba(46,134,171,0.18);border:1px solid rgba(46,134,171,0.35);font-size:0.8rem;font-weight:600;color:#7ec8e3;">✓ STL Geometry Analysis</span>
@@ -132,13 +132,13 @@ col1, col2, col3, col4 = st.columns(4, gap="medium")
 
 _MODULES = [
     ("📤", "Upload & Analyse",
-     "Full CDMO pipeline — geometry, Ergun flow, Archimedes buoyancy, weighted scoring and Pareto frontier.",
+     "Full CDMO pipeline: geometry, Ergun flow, Archimedes buoyancy, weighted scoring and Pareto frontier.",
      "blue"),
     ("📈", "Sensitivity Analysis",
      "One-at-a-time sensitivity quantification. Identifies which geometric parameters drive each objective.",
      "blue"),
     ("🖨️", "STL Generator",
-     "Parametric carrier generation — cross-flow, honeycomb, lattice and hybrid topologies with live 3D preview.",
+     "Parametric carrier generation: cross-flow, honeycomb, lattice and hybrid topologies with live 3D preview.",
      ""),
     ("🗺️", "Design Comparison",
      "Heatmaps and matrix views for all 16 designs × 4 materials = 64 combinations simultaneously.",
@@ -147,7 +147,7 @@ _MODULES = [
      "Save and reload complete sessions as portable JSON. No STL re-uploading across research sessions.",
      ""),
     ("🧬", "GA Optimiser",
-     "NSGA-II genetic algorithm with SBX crossover and polynomial mutation — finds Pareto-optimal geometries.",
+     "NSGA-II genetic algorithm with SBX crossover and polynomial mutation finds Pareto-optimal geometries.",
      "orange"),
     ("📊", "Statistical Analysis",
      "ANOVA, Kruskal-Wallis, Bonferroni correction, Cohen's d, Pearson / Spearman correlations and linear regression.",
@@ -202,7 +202,7 @@ with col_steps:
         ("01", "Upload & Analyse",
          "Upload all STL files, select all 4 materials, run the full CDMO pipeline."),
         ("02", "Save Session",
-         "Save to the Session Manager — no re-uploading needed in future sessions."),
+         "Save to the Session Manager, no re-uploading needed in future sessions."),
         ("03", "Compare & Identify",
          "Open Design Comparison to find patterns across the 16 × 4 matrix."),
         ("04", "Sensitivity Analysis",
@@ -248,7 +248,7 @@ with col_context:
         ("🔬", "Research scope",
          "Evaluates 3D-printed Moving Bed Biofilm Reactor (MBBR) carriers for decentralised faecal sludge treatment in Sub-Saharan Africa."),
         ("⚙️", "Physics models",
-         "Ergun equation, Kozeny-Carman permeability, Wilson-Geankoplis mass transfer and Archimedes buoyancy — all computed from STL geometry."),
+         "Ergun equation, Kozeny-Carman permeability, Wilson-Geankoplis mass transfer and Archimedes buoyancy are all computed from STL geometry."),
         ("🧬", "Optimisation",
          "NSGA-II with non-dominated sorting, crowding distance, simulated binary crossover and polynomial mutation over a 10-parameter design space."),
         ("📊", "Statistics",
@@ -318,7 +318,7 @@ st.markdown(
       </div>
       <div style="font-size:0.78rem;color:var(--text-muted);line-height:1.6;">
         University of Ibadan · Department of Mechanical Engineering<br>
-        PhD Research — Computational Design &amp; Multi-Objective Optimization
+        PhD Research: Computational Design &amp; Multi-Objective Optimization
         of 3D Printed Biofilm Carriers for Faecal Sludge Treatment
       </div>
     </div>
