@@ -8,7 +8,7 @@ from utils.ui import inject_base_styles
 
 # Already logged in → go straight to home
 if is_authenticated():
-    st.switch_page("home.py")
+  st.switch_page("app.py")
 
 # ─── Page-specific overrides ──────────────────────────────────────────────────
 st.markdown(
@@ -129,16 +129,23 @@ st.markdown(
         padding: 1rem 0 0.5rem;
         border-top: 1px solid var(--border);
       }
-      /* st.page_link styled as footer link */
-      .auth-footer [data-testid="stPageLink"] a,
-      .auth-footer-nav [data-testid="stPageLink"] a {
+      .auth-footer-inline {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+        font-size: 0.84rem;
+        color: var(--text-muted);
+      }
+      .auth-footer-inline a {
         color: var(--accent) !important;
         font-size: 0.84rem !important;
         font-weight: 600 !important;
         text-decoration: none !important;
       }
-      .auth-footer-nav [data-testid="stPageLink"] a:hover { text-decoration: underline !important; }
-      .auth-footer-nav { text-align: center; margin-top: 0.5rem; }
+      .auth-footer-inline a:hover { text-decoration: underline !important; }
 
       /* ── Trust badge strip ── */
       .auth-trust {
@@ -249,20 +256,19 @@ with col:
                 st.session_state["_cdmo_user"]  = username.strip().lower()
                 st.session_state["_cdmo_token"] = token
                 st.success("Signed in! Redirecting…")
-                st.switch_page("home.py")
+                st.switch_page("app.py")
             except AuthError as e:
                 st.error(str(e))
 
     st.markdown(
         """
-        <div class="auth-footer">Don't have an account?</div>
+        <div class="auth-footer-inline">
+          <span>Don't have an account?</span>
+          <a href="/auth/signup" target="_self">Create one free →</a>
+        </div>
         """,
         unsafe_allow_html=True,
     )
-    # st.page_link is the only Streamlit-native way to navigate between pages
-    st.markdown('<div class="auth-footer-nav">', unsafe_allow_html=True)
-    st.page_link("pages/auth/signup.py", label="Create one free →")
-    st.markdown('</div>', unsafe_allow_html=True)
     st.markdown(
         """
         <div class="auth-trust">

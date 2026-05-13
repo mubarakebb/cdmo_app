@@ -8,7 +8,7 @@ from utils.ui import inject_base_styles
 
 # Already logged in → go straight to home
 if is_authenticated():
-    st.switch_page("home.py")
+  st.switch_page("app.py")
 
 # ─── Page-specific overrides ──────────────────────────────────────────────────
 st.markdown(
@@ -303,7 +303,7 @@ with col:
                 st.session_state["_cdmo_user"]  = username.strip().lower()
                 st.session_state["_cdmo_token"] = token
                 st.success(f"Account created! Welcome, {full_name or username}. Redirecting…")
-                st.switch_page("home.py")
+                st.switch_page("app.py")
             except AuthError as e:
                 st.error(str(e))
 
