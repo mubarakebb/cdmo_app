@@ -207,6 +207,52 @@ h1, h2, h3, h4,
   transform: translateY(-2px) !important;
 }}
 
+/* Sidebar buttons */
+[data-testid="stSidebar"] .stButton > button {{
+  width: 100% !important;
+  border: 1px solid var(--border) !important;
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  padding: 0.6rem 1rem !important;
+  font-size: 0.875rem !important;
+  border-radius: var(--radius-md) !important;
+}}
+
+[data-testid="stSidebar"] .stButton > button:hover {{
+  background: var(--bg-card-hover) !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}}
+
+/* Sidebar toggle button */
+[data-testid="collapsedControl"] {{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}}
+
+[data-testid="collapsedControl"]:hover {{
+  background: var(--bg-card-hover) !important;
+  border-color: var(--accent) !important;
+}}
+
+[data-testid="collapsedControl"] svg {{
+  width: 18px !important;
+  height: 18px !important;
+  color: var(--text-primary) !important;
+  stroke: currentColor !important;
+  fill: none !important;
+}}
+
 /* ── Form inputs ─────────────────────────────────────── */
 .stTextInput input,
 .stNumberInput input,

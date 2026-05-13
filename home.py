@@ -11,96 +11,31 @@ inject_base_styles()
 sidebar_brand()
 
 # ─── Hero ─────────────────────────────────────────────────────────────────────
-st.markdown(
-    """
-    <div style="position:relative;overflow:hidden;
-                padding:3rem 2.5rem 2.8rem;
-                background:linear-gradient(135deg,#0a0b14 0%,#10121f 50%,#0d1320 100%);
-                border-radius:var(--radius-xl);
-                margin-bottom:1.8rem;
-                box-shadow:0 20px 60px rgba(0,0,0,0.22);">
-
-      <!-- Orb decorations -->
-      <div class="cdmo-orb cdmo-orb-purple"
-           style="width:560px;height:560px;top:-200px;right:-80px;opacity:0.55;"></div>
-      <div class="cdmo-orb cdmo-orb-blue"
-           style="width:320px;height:320px;bottom:-100px;left:-60px;opacity:0.50;"></div>
-      <div class="cdmo-orb"
-           style="width:200px;height:200px;background:var(--orb-teal);
-                  top:60%;right:30%;filter:blur(60px);animation:cdmo-drift 9s ease-in-out infinite alternate;"></div>
-
-      <!-- Content -->
-      <div style="position:relative;z-index:1;">
-        <div class="cdmo-reveal cdmo-reveal-1">
-          <span style="display:inline-flex;align-items:center;gap:0.5rem;
-                       padding:0.3rem 0.85rem;border-radius:var(--radius-pill);
-                       background:rgba(255,255,255,0.08);
-                       border:1px solid rgba(255,255,255,0.15);
-                       font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.7);
-                       letter-spacing:0.08em;text-transform:uppercase;
-                       margin-bottom:1.1rem;">
-            🎓 University of Ibadan · PhD Research
-          </span>
-        </div>
-
-        <h1 class="cdmo-reveal cdmo-reveal-2"
-            style="font-family:var(--font-heading);
-                   font-size:clamp(2rem,5vw,3.2rem);
-                   font-weight:800;
-                   line-height:1.1;
-                   letter-spacing:-0.04em;
-                   color:#fff;
-                   margin:0 0 0.75rem;">
-          Computational Design &<br>
-          <span style="background:linear-gradient(135deg,#2E86AB,#818cf8);
-                       -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-                       background-clip:text;">Multi-Objective Optimization</span>
-        </h1>
-
-        <p class="cdmo-reveal cdmo-reveal-3"
-           style="font-size:1.05rem;color:rgba(255,255,255,0.62);
-                  max-width:560px;line-height:1.65;margin:0 0 2rem;">
-          Evaluate, compare and evolve 3D-printed biofilm carriers for
-          faecal sludge treatment — geometry analysis, flow simulation,
-          NSGA-II optimisation and automated thesis reporting in one platform.
-        </p>
-
-        <div class="cdmo-reveal cdmo-reveal-4"
-             style="display:flex;flex-wrap:wrap;gap:0.6rem;">
-          <span style="display:inline-flex;align-items:center;gap:0.4rem;
-                       padding:0.35rem 0.85rem;border-radius:var(--radius-pill);
-                       background:rgba(46,134,171,0.18);
-                       border:1px solid rgba(46,134,171,0.35);
-                       font-size:0.8rem;font-weight:600;color:#7ec8e3;">
-            ✓ STL Geometry Analysis
-          </span>
-          <span style="display:inline-flex;align-items:center;gap:0.4rem;
-                       padding:0.35rem 0.85rem;border-radius:var(--radius-pill);
-                       background:rgba(99,102,241,0.18);
-                       border:1px solid rgba(99,102,241,0.35);
-                       font-size:0.8rem;font-weight:600;color:#a5b4fc;">
-            ✓ NSGA-II Genetic Algorithm
-          </span>
-          <span style="display:inline-flex;align-items:center;gap:0.4rem;
-                       padding:0.35rem 0.85rem;border-radius:var(--radius-pill);
-                       background:rgba(20,184,166,0.15);
-                       border:1px solid rgba(20,184,166,0.30);
-                       font-size:0.8rem;font-weight:600;color:#5eead4;">
-            ✓ Pareto Frontier Analysis
-          </span>
-          <span style="display:inline-flex;align-items:center;gap:0.4rem;
-                       padding:0.35rem 0.85rem;border-radius:var(--radius-pill);
-                       background:rgba(249,115,22,0.15);
-                       border:1px solid rgba(249,115,22,0.30);
-                       font-size:0.8rem;font-weight:600;color:#fdba74;">
-            ✓ Automated PDF Reports
-          </span>
-        </div>
-      </div>
+hero_html = """<div style="position:relative;overflow:hidden;padding:3rem 2.5rem 2.8rem;background:linear-gradient(135deg,#0a0b14 0%,#10121f 50%,#0d1320 100%);border-radius:var(--radius-xl);margin-bottom:1.8rem;box-shadow:0 20px 60px rgba(0,0,0,0.22);">
+  <div class="cdmo-orb cdmo-orb-purple" style="width:560px;height:560px;top:-200px;right:-80px;opacity:0.55;"></div>
+  <div class="cdmo-orb cdmo-orb-blue" style="width:320px;height:320px;bottom:-100px;left:-60px;opacity:0.50;"></div>
+  <div class="cdmo-orb" style="width:200px;height:200px;background:var(--orb-teal);top:60%;right:30%;filter:blur(60px);animation:cdmo-drift 9s ease-in-out infinite alternate;"></div>
+  <div style="position:relative;z-index:1;">
+    <div class="cdmo-reveal cdmo-reveal-1">
+      <span style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.3rem 0.85rem;border-radius:var(--radius-pill);background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.7);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.1rem;">
+        🎓 University of Ibadan · PhD Research
+      </span>
     </div>
-    """,
-    unsafe_allow_html=True,
-)
+    <h1 class="cdmo-reveal cdmo-reveal-2" style="font-family:var(--font-heading);font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.1;letter-spacing:-0.04em;color:#fff;margin:0 0 0.75rem;">
+      Computational Design &<br><span style="background:linear-gradient(135deg,#2E86AB,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Multi-Objective Optimization</span>
+    </h1>
+    <p class="cdmo-reveal cdmo-reveal-3" style="font-size:1.05rem;color:rgba(255,255,255,0.62);max-width:560px;line-height:1.65;margin:0 0 2rem;">
+      Evaluate, compare and evolve 3D-printed biofilm carriers for faecal sludge treatment — geometry analysis, flow simulation, NSGA-II optimisation and automated thesis reporting in one platform.
+    </p>
+    <div class="cdmo-reveal cdmo-reveal-4" style="display:flex;flex-wrap:wrap;gap:0.6rem;">
+      <span style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.35rem 0.85rem;border-radius:var(--radius-pill);background:rgba(46,134,171,0.18);border:1px solid rgba(46,134,171,0.35);font-size:0.8rem;font-weight:600;color:#7ec8e3;">✓ STL Geometry Analysis</span>
+      <span style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.35rem 0.85rem;border-radius:var(--radius-pill);background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);font-size:0.8rem;font-weight:600;color:#a5b4fc;">✓ NSGA-II Genetic Algorithm</span>
+      <span style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.35rem 0.85rem;border-radius:var(--radius-pill);background:rgba(20,184,166,0.15);border:1px solid rgba(20,184,166,0.30);font-size:0.8rem;font-weight:600;color:#5eead4;">✓ Pareto Frontier Analysis</span>
+      <span style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.35rem 0.85rem;border-radius:var(--radius-pill);background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.30);font-size:0.8rem;font-weight:600;color:#fdba74;">✓ Automated PDF Reports</span>
+    </div>
+  </div>
+</div>"""
+st.markdown(hero_html, unsafe_allow_html=True)
 
 # ─── Live session stats (if data is loaded) ──────────────────────────────────
 if st.session_state.get("all_carriers"):
