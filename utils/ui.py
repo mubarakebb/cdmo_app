@@ -555,6 +555,22 @@ hr {{
   font-size: 0.82rem !important;
   line-height: 1.4 !important;
 }}
+[data-testid="stFileUploaderDropzone"] button {{
+  width: 100% !important;
+  min-width: 100% !important;
+  padding: 0.65rem 1.25rem !important;
+  border-radius: var(--radius-pill) !important;
+  border: 1.5px solid var(--accent) !important;
+  background: transparent !important;
+  color: var(--accent) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  cursor: pointer !important;
+  transition: background 0.2s, border-color 0.2s !important;
+}}
+[data-testid="stFileUploaderDropzone"] button:hover {{
+  background: rgba(46,134,171,0.06) !important;
+}}
 [data-testid="stFileUploaderDropzone"] button span {{
   display: inline !important;
 }}
@@ -1161,7 +1177,7 @@ def sidebar_brand(
             )
 
             if st.sidebar.button(
-                "⏻  Sign Out",
+                "🚪 Sign Out",
                 use_container_width=True,
                 key="_cdmo_logout_btn",
             ):
