@@ -256,7 +256,7 @@ with col:
                 st.session_state["_cdmo_user"]  = username.strip().lower()
                 st.session_state["_cdmo_token"] = token
                 st.success("Signed in! Redirecting…")
-                st.switch_page("app.py")
+                st.rerun()
             except AuthError as e:
                 st.error(str(e))
 
