@@ -81,6 +81,19 @@ html, body, .stApp, .stApp *,
   -webkit-font-smoothing: antialiased;
 }}
 
+/* Restore Material Symbols font — the broad rule above strips it,
+   which causes icon ligatures to render as raw text (e.g. "keyboard_double_arrow_left") */
+[class*="material-symbols"],
+[data-testid="stSidebarCollapseButton"] button span,
+[data-testid="collapsedControl"] span,
+[data-baseweb="icon"] span,
+span[data-testid="stIconMaterial"] {{
+  font-family: 'Material Symbols Rounded', 'Material Icons', sans-serif !important;
+  font-feature-settings: 'liga' 1 !important;
+  -webkit-font-feature-settings: 'liga' 1 !important;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+}}
+
 h1, h2, h3, h4,
 .cdmo-h1, .cdmo-h2, .cdmo-h3 {{
   font-family: var(--font-heading) !important;
@@ -524,13 +537,26 @@ hr {{
   gap: 0.4rem !important;
 }}
 
-[data-testid="stFileUploaderDropzone"] small,
-[data-testid="stFileUploaderDropzone"] span {{
+[data-testid="stFileUploaderDropzone"] small {{
   display: block !important;
   text-align: center !important;
   color: var(--text-muted) !important;
   font-size: 0.82rem !important;
   line-height: 1.4 !important;
+}}
+
+/* Scope span styling to non-button spans only — applying display:block to
+   ALL spans inside the dropzone forces hidden button label spans to appear,
+   which causes the "Browse files / Upload" text to show twice */
+[data-testid="stFileUploaderDropzone"] > div > span {{
+  display: block !important;
+  text-align: center !important;
+  color: var(--text-muted) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.4 !important;
+}}
+[data-testid="stFileUploaderDropzone"] button span {{
+  display: inline !important;
 }}
 
 /* ── Checkboxes / Radio ───────────────────────────────── */
