@@ -224,7 +224,37 @@ h1, h2, h3, h4,
   color: var(--accent) !important;
 }}
 
-/* Sidebar toggle button */
+/* ── Sidebar collapse / expand buttons ─── */
+
+/* Collapse arrow inside the open sidebar */
+[data-testid="stSidebarCollapseButton"] {{
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}}
+
+[data-testid="stSidebarCollapseButton"] button {{
+  background: transparent !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-secondary) !important;
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}}
+
+[data-testid="stSidebarCollapseButton"] button:hover {{
+  background: var(--bg-card-hover) !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}}
+
+/* Floating expand pill shown when sidebar is collapsed */
 [data-testid="collapsedControl"] {{
   display: flex !important;
   align-items: center !important;
@@ -465,15 +495,42 @@ hr {{
 }}
 
 /* ── File uploader ────────────────────────────────────── */
+/* Target the inner dropzone only — styling the outer container
+   bleeds into the internal layout and causes text to overlap. */
 [data-testid="stFileUploader"] {{
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}}
+
+[data-testid="stFileUploaderDropzone"] {{
   border: 2px dashed var(--border) !important;
   border-radius: var(--radius-lg) !important;
   background: var(--bg-secondary) !important;
-  transition: border-color 0.2s !important;
+  transition: border-color 0.2s, background 0.2s !important;
+  padding: 1.25rem 1rem !important;
 }}
 
-[data-testid="stFileUploader"]:hover {{
+[data-testid="stFileUploaderDropzone"]:hover {{
   border-color: var(--accent) !important;
+  background: rgba(46,134,171,0.04) !important;
+}}
+
+/* Ensure text inside the dropzone is properly stacked */
+[data-testid="stFileUploaderDropzone"] > div {{
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+}}
+
+[data-testid="stFileUploaderDropzone"] small,
+[data-testid="stFileUploaderDropzone"] span {{
+  display: block !important;
+  text-align: center !important;
+  color: var(--text-muted) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.4 !important;
 }}
 
 /* ── Checkboxes / Radio ───────────────────────────────── */
