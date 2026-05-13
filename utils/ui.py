@@ -839,6 +839,20 @@ hr {{
   gap: 0.25rem;
 }}
 
+/* Explicit text color for feature cards - ensure contrast on all backgrounds */
+.cdmo-feature-card {{
+  background: #ffffff !important;
+  color: #0d0f1a !important;
+}}
+
+.cdmo-feature-card-title {{
+  color: #0d0f1a !important;
+}}
+
+.cdmo-feature-card-body {{
+  color: #666d7d !important;
+}}
+
 /* Process step */
 .cdmo-step {{
   display: flex;
