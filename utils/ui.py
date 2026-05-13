@@ -534,41 +534,27 @@ hr {{
   box-shadow: 0 0 0 4px rgba(46,134,171,0.08) !important;
 }}
 
-/* Stack all dropzone content vertically and centre it */
-[data-testid="stFileUploaderDropzone"] > div {{
+/* Force every level of the dropzone into a centred column so the
+   button sits above the size hint regardless of Streamlit's own layout */
+[data-testid="stFileUploaderDropzone"] > div,
+[data-testid="stFileUploaderDropzone"] > div > div,
+[data-testid="stFileUploaderDropzone"] section {{
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 0.6rem !important;
-  text-align: center !important;
+  gap: 0.65rem !important;
   width: 100% !important;
-}}
-
-/* Helper text and limit label */
-[data-testid="stFileUploaderDropzone"] small {{
-  display: block !important;
   text-align: center !important;
-  color: var(--text-muted) !important;
-  font-size: 0.8rem !important;
-  line-height: 1.5 !important;
-  margin-top: 0.2rem !important;
 }}
 
-/* "Drag and drop" or similar non-button span labels */
-[data-testid="stFileUploaderDropzone"] > div > span {{
-  display: block !important;
-  text-align: center !important;
-  color: var(--text-secondary) !important;
-  font-size: 0.88rem !important;
-  font-weight: 500 !important;
-  line-height: 1.5 !important;
-}}
-
-/* Upload / Browse button — full width, pill, accent gradient */
+/* Upload / Browse button — centred, pill, accent gradient */
 [data-testid="stFileUploaderDropzone"] button {{
+  order: 1 !important;
+  display: block !important;
   width: 100% !important;
-  max-width: 360px !important;
+  max-width: 320px !important;
+  margin: 0 auto !important;
   padding: 0.75rem 2rem !important;
   border-radius: var(--radius-pill) !important;
   border: none !important;
@@ -581,13 +567,35 @@ hr {{
   cursor: pointer !important;
   box-shadow: 0 4px 14px rgba(46,134,171,0.30) !important;
   transition: transform 0.2s, box-shadow 0.2s !important;
-  margin-top: 0.4rem !important;
 }}
 [data-testid="stFileUploaderDropzone"] button:hover {{
   transform: translateY(-2px) !important;
   box-shadow: 0 8px 22px rgba(46,134,171,0.40) !important;
 }}
-/* Keep button label inline (prevents duplicate text bug) */
+
+/* Size/type hint — sits below the button */
+[data-testid="stFileUploaderDropzone"] small {{
+  order: 2 !important;
+  display: block !important;
+  text-align: center !important;
+  color: var(--text-muted) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.5 !important;
+  width: 100% !important;
+}}
+
+/* "Drag and drop" or similar non-button span labels */
+[data-testid="stFileUploaderDropzone"] > div > span {{
+  order: 0 !important;
+  display: block !important;
+  text-align: center !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.88rem !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+}}
+
+/* Keep button label inline (prevents duplicate-text bug) */
 [data-testid="stFileUploaderDropzone"] button span {{
   display: inline !important;
 }}
