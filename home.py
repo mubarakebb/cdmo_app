@@ -248,7 +248,7 @@ with col_context:
         ("🔬", "Research scope",
          "Evaluates 3D-printed Moving Bed Biofilm Reactor (MBBR) carriers for decentralised faecal sludge treatment in Sub-Saharan Africa."),
         ("⚙️", "Physics models",
-         "Ergun equation, Kozeny-Carman permeability, Wilson-Geankoplis mass transfer, and Archimedes buoyancy — all computed from STL geometry."),
+         "Ergun equation, Kozeny-Carman permeability, Wilson-Geankoplis mass transfer and Archimedes buoyancy — all computed from STL geometry."),
         ("🧬", "Optimisation",
          "NSGA-II with non-dominated sorting, crowding distance, simulated binary crossover and polynomial mutation over a 10-parameter design space."),
         ("📊", "Statistics",

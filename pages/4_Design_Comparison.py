@@ -224,7 +224,7 @@ st.plotly_chart(fig_pivot, use_container_width=True)
 st.markdown("---")
 
 # ─── Parallel coordinates ─────────────────────────────────────────────────────
-st.markdown("### Parallel Coordinates — Design Space Explorer")
+st.markdown("### Parallel Coordinates: Design Space Explorer")
 st.caption("Drag axes to reorder. Brush on any axis to filter designs. "
            "Useful for finding designs that satisfy multiple criteria simultaneously.")
 

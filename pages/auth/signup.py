@@ -1,5 +1,5 @@
 """
-CDMO Studio — Sign Up page  (Folio premium design)
+CDMO Studio Sign Up page
 """
 
 import streamlit as st

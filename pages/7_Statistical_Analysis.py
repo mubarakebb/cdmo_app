@@ -20,7 +20,7 @@ page_header(
     HeaderSpec(
         icon="📊",
         title="Statistical Analysis",
-        subtitle="Rigorous hypothesis testing, effect sizes, and correlation analysis.",
+        subtitle="Rigorous hypothesis testing, effect sizes and correlation analysis.",
         accent="#1E8449",
         accent_2="#1A5276",
     )
@@ -135,7 +135,7 @@ with col_violin:
 st.markdown("---")
 
 # ─── ANOVA / Kruskal-Wallis Results ──────────────────────────────────────────
-st.markdown("### Hypothesis Tests — Material Effect on Performance")
+st.markdown("### Hypothesis Tests: Material Effect on Performance")
 st.caption("Tests whether material type has a statistically significant effect on each metric. "
            "ANOVA used when normality and equal variance hold; Kruskal-Wallis otherwise.")
 

@@ -110,7 +110,7 @@ def register_user(
     if len(username) < 3:
         raise AuthError("Username must be at least 3 characters.")
     if not username.isalnum() and not all(c.isalnum() or c in "_-" for c in username):
-        raise AuthError("Username may only contain letters, numbers, hyphens, and underscores.")
+        raise AuthError("Username may only contain letters, numbers, hyphens and underscores.")
     if len(password) < 8:
         raise AuthError("Password must be at least 8 characters.")
     if email and "@" not in email:

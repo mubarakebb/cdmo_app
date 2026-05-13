@@ -192,15 +192,15 @@ with st.sidebar:
     st.caption("Adjust importance of each performance metric")
     
     w_sav = st.slider("SA/V Ratio", 0.0, 1.0, 0.30, 0.05,
-                       help="Surface area to volume ratio — biofilm attachment potential")
+                       help="Surface area to volume ratio - biofilm attachment potential")
     w_por = st.slider("Porosity", 0.0, 1.0, 0.20, 0.05,
-                       help="Void fraction — hydraulic conductivity and accessibility")
+                       help="Void fraction - hydraulic conductivity and accessibility")
     w_flow = st.slider("Flow Efficiency", 0.0, 1.0, 0.20, 0.05,
-                        help="Hydraulic performance — pressure drop and mass transfer")
+                        help="Hydraulic performance -  pressure drop and mass transfer")
     w_buoy = st.slider("Buoyancy Suitability", 0.0, 1.0, 0.15, 0.05,
-                        help="Reactor mixing behaviour — carrier distribution")
+                        help="Reactor mixing behaviour - carrier distribution")
     w_bio = st.slider("Biofilm Affinity", 0.0, 1.0, 0.10, 0.05,
-                       help="Material surface chemistry — microbial attachment")
+                       help="Material surface chemistry - microbial attachment")
     w_mech = st.slider("Mechanical Strength", 0.0, 1.0, 0.05, 0.05,
                         help="Structural durability under hydraulic loading")
     
@@ -487,7 +487,7 @@ with tab2:
             st.plotly_chart(fig_box, use_container_width=True)
         
         st.markdown("---")
-        st.markdown("### 🕸️ Radar Chart — Objective Profile")
+        st.markdown("### 🕸️ Radar Chart: Objective Profile")
         
         # Show radar for top 5 or selected carriers
         top_n = min(5, len(carriers))
@@ -518,7 +518,7 @@ with tab2:
             polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
             showlegend=True,
             height=450,
-            title="Multi-Objective Profile — Top 5 Designs"
+            title="Multi-Objective Profile: Top 5 Designs"
         )
         st.plotly_chart(fig_radar, use_container_width=True)
         
@@ -955,11 +955,11 @@ with tab5:
             "Fluid Viscosity (Pa·s)": fluid_viscosity,
             "Superficial Velocity (m/s)": flow_velocity,
             "Temperature (°C)": temperature,
-            "Weight — SA/V Ratio": w_sav,
-            "Weight — Porosity": w_por,
-            "Weight — Flow Efficiency": w_flow,
-            "Weight — Buoyancy": w_buoy,
-            "Weight — Biofilm Affinity": w_bio,
-            "Weight — Mechanical": w_mech,
+            "Weight SA/V Ratio": w_sav,
+            "Weight Porosity": w_por,
+            "Weight Flow Efficiency": w_flow,
+            "Weight Buoyancy": w_buoy,
+            "Weight Biofilm Affinity": w_bio,
+            "Weight Mechanical": w_mech,
         }
         st.json(params)

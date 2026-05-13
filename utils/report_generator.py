@@ -1,7 +1,7 @@
 """
 PDF Report Generator
 Produces automated thesis-quality PDF reports from CDMO analysis results.
-Includes summary statistics, rankings, Pareto findings, and all charts.
+Includes summary statistics, rankings, Pareto findings and all charts.
 """
 
 import io
@@ -968,7 +968,7 @@ def generate_pdf_report(
             pdf.image(ga_chart, x=10, w=190)
             pdf.ln(3)
             pdf.body_text("The genetic algorithm converged toward high-performance designs through selection, "
-                         "crossover, and mutation. Best scores plateaued around generation 40, indicating convergence.")
+                         "crossover and mutation. Best scores plateaued around generation 40, indicating convergence.")
             try:
                 os.unlink(ga_chart)
             except:
@@ -1185,7 +1185,7 @@ def generate_pdf_report(
             pdf.ln(3)
             pdf.body_text("Biofilm development follows logistic growth. High-SA/V designs achieve faster coverage, "
                          "while low-affinity materials show slower colonization. Equilibrium coverage depends on "
-                         "bulk concentration, substrate utilization rate, and carrier material properties.")
+                         "bulk concentration, substrate utilization rate and carrier material properties.")
             try:
                 os.unlink(biofilm_chart)
             except:

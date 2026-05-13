@@ -60,7 +60,7 @@ st.markdown(
 
 st.markdown("""
 The GA evolves a population of parametric carrier designs over multiple generations,
-using tournament selection, simulated binary crossover, and polynomial mutation.
+using tournament selection, simulated binary crossover and polynomial mutation.
 Pareto-optimal designs on the final front represent the best achievable trade-offs
 between competing objectives.
 """)
@@ -194,7 +194,7 @@ if run_btn:
 
     def update_progress(gen, total, frac):
         progress_bar.progress(min(frac, 1.0))
-        status.text(f"Generation {gen}/{total} — evolving population...")
+        status.text(f"Generation {gen}/{total} evolving population...")
 
     try:
         with st.spinner("Running NSGA-II..."):

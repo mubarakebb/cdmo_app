@@ -28,7 +28,7 @@ sidebar_brand()
 st.markdown("""
 The report includes: executive summary, performance rankings, Pareto frontier,
 radar charts, bar charts, statistical tests, correlation analysis, regression models,
-and full geometry metrics — all in a single professionally formatted PDF.
+and full geometry metrics, all in a single professionally formatted PDF.
 """)
 
 if not st.session_state.get("all_carriers"):

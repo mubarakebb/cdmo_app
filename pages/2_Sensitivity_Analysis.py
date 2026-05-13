@@ -33,8 +33,8 @@ sidebar_brand()
 
 st.markdown("""
 Sensitivity analysis answers the question: **which geometric parameters matter most?**
-This is a core research contribution — it shows which design variables have the greatest
-influence on biofilm carrier performance, and in which direction.
+This is a core research contribution, it shows which design variables have the greatest
+influence on biofilm carrier performance and in which direction.
 """)
 
 
@@ -111,7 +111,7 @@ with st.sidebar:
             "Porosity (0 – 1)",
             min_value=0.10, max_value=0.95,
             value=0.60, step=0.01, format="%.2f",
-            help="Void fraction — ratio of open space to total bounding volume.",
+            help="Void fraction is theratio of open space to total bounding volume.",
         )
         manual_hd = st.number_input(
             "Hydraulic Diameter (mm)",
@@ -207,7 +207,7 @@ is_manual = st.session_state.get("sensitivity_mode") == "manual"
 # ─── Baseline info banner (manual mode) ──────────────────────────────────────
 if is_manual:
     st.info(
-        f"**Manual baseline** — "
+        f"**Manual baseline** - "
         f"SA/V: {geo.sav_ratio:.2f} mm⁻¹ · "
         f"Porosity: {geo.porosity:.2f} · "
         f"Dₕ: {geo.hydraulic_diameter:.1f} mm · "
@@ -249,7 +249,7 @@ st.plotly_chart(fig_importance, use_container_width=True)
 st.markdown("---")
 
 # ─── Sensitivity Heatmap ──────────────────────────────────────────────────────
-st.markdown("### Sensitivity Heatmap — Parameter × Objective")
+st.markdown("### Sensitivity Heatmap: Parameter × Objective")
 st.caption("Each cell shows how strongly varying that parameter affects that objective. "
            "Darker = stronger sensitivity.")
 

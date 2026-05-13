@@ -21,7 +21,7 @@ page_header(
     HeaderSpec(
         icon="💾",
         title="Session Manager",
-        subtitle="Save and reload complete analysis sessions — no need to re-upload STL files.",
+        subtitle="Save and reload complete analysis sessions, no need to re-upload STL files.",
         accent="#1E8449",
         accent_2="#1A5276",
     )
@@ -133,7 +133,7 @@ with tab_load:
                             st.session_state.all_carriers = data["all_carriers"]
                             st.session_state.results = data["results"]
                             st.success(
-                                f"✅ Loaded '{s['session_name']}' — "
+                                f"✅ Loaded '{s['session_name']}' "
                                 f"{len(data['all_carriers'])} designs ready.")
                             st.rerun()
                         except Exception as e:

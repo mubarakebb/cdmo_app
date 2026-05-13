@@ -228,7 +228,7 @@ if "generated_geo" in st.session_state:
     with open(out_path, "rb") as f:
         stl_bytes = f.read()
 
-    st.markdown("### Generated Design — Verified Metrics")
+    st.markdown("### Generated Design - Verified Metrics")
 
     col1, col2, col3, col4, col5 = st.columns(5)
     col1.metric("Surface Area (mm²)", f"{geo.surface_area:,.1f}")
