@@ -508,8 +508,6 @@ hr {{
 }}
 
 /* ── File uploader ────────────────────────────────────── */
-/* Target the inner dropzone only — styling the outer container
-   bleeds into the internal layout and causes text to overlap. */
 [data-testid="stFileUploader"] {{
   border: none !important;
   background: transparent !important;
@@ -518,59 +516,78 @@ hr {{
 
 [data-testid="stFileUploaderDropzone"] {{
   border: 2px dashed var(--border) !important;
-  border-radius: var(--radius-lg) !important;
-  background: var(--bg-secondary) !important;
-  transition: border-color 0.2s, background 0.2s !important;
-  padding: 1.25rem 1rem !important;
+  border-radius: var(--radius-xl) !important;
+  background: linear-gradient(135deg,
+    rgba(46,134,171,0.03) 0%,
+    rgba(99,102,241,0.03) 100%) !important;
+  transition: border-color 0.25s, background 0.25s, box-shadow 0.25s !important;
+  padding: 2.8rem 2rem !important;
+  min-height: 180px !important;
+  cursor: pointer !important;
 }}
 
 [data-testid="stFileUploaderDropzone"]:hover {{
   border-color: var(--accent) !important;
-  background: rgba(46,134,171,0.04) !important;
+  background: linear-gradient(135deg,
+    rgba(46,134,171,0.07) 0%,
+    rgba(99,102,241,0.05) 100%) !important;
+  box-shadow: 0 0 0 4px rgba(46,134,171,0.08) !important;
 }}
 
-/* Ensure text inside the dropzone is properly stacked */
+/* Stack all dropzone content vertically and centre it */
 [data-testid="stFileUploaderDropzone"] > div {{
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
-  gap: 0.4rem !important;
+  justify-content: center !important;
+  gap: 0.6rem !important;
+  text-align: center !important;
+  width: 100% !important;
 }}
 
+/* Helper text and limit label */
 [data-testid="stFileUploaderDropzone"] small {{
   display: block !important;
   text-align: center !important;
   color: var(--text-muted) !important;
-  font-size: 0.82rem !important;
-  line-height: 1.4 !important;
+  font-size: 0.8rem !important;
+  line-height: 1.5 !important;
+  margin-top: 0.2rem !important;
 }}
 
-/* Scope span styling to non-button spans only — applying display:block to
-   ALL spans inside the dropzone forces hidden button label spans to appear,
-   which causes the "Browse files / Upload" text to show twice */
+/* "Drag and drop" or similar non-button span labels */
 [data-testid="stFileUploaderDropzone"] > div > span {{
   display: block !important;
   text-align: center !important;
-  color: var(--text-muted) !important;
-  font-size: 0.82rem !important;
-  line-height: 1.4 !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.88rem !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
 }}
+
+/* Upload / Browse button — full width, pill, accent gradient */
 [data-testid="stFileUploaderDropzone"] button {{
   width: 100% !important;
-  min-width: 100% !important;
-  padding: 0.65rem 1.25rem !important;
+  max-width: 360px !important;
+  padding: 0.75rem 2rem !important;
   border-radius: var(--radius-pill) !important;
-  border: 1.5px solid var(--accent) !important;
-  background: transparent !important;
-  color: var(--accent) !important;
+  border: none !important;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-indigo) 100%) !important;
+  color: #fff !important;
+  font-family: var(--font-heading) !important;
   font-weight: 600 !important;
-  font-size: 0.9rem !important;
+  font-size: 0.92rem !important;
+  letter-spacing: -0.01em !important;
   cursor: pointer !important;
-  transition: background 0.2s, border-color 0.2s !important;
+  box-shadow: 0 4px 14px rgba(46,134,171,0.30) !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+  margin-top: 0.4rem !important;
 }}
 [data-testid="stFileUploaderDropzone"] button:hover {{
-  background: rgba(46,134,171,0.06) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 22px rgba(46,134,171,0.40) !important;
 }}
+/* Keep button label inline (prevents duplicate text bug) */
 [data-testid="stFileUploaderDropzone"] button span {{
   display: inline !important;
 }}
@@ -825,13 +842,13 @@ hr {{
 }}
 
 .cdmo-header-title {{
-  font-family: var(--font-heading);
-  font-size: clamp(1.35rem, 3vw, 1.9rem);
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  margin: 0;
+  font-family: var(--font-heading) !important;
+  font-size: clamp(1.35rem, 3vw, 1.9rem) !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1.1 !important;
+  margin: 0 !important;
 }}
 
 .cdmo-header-subtitle {{
