@@ -307,6 +307,7 @@ def save_ga_result(ga_result, session_name: str = "ga_run") -> str:
         "material":          ga_result.material,
         "n_generations":     ga_result.n_generations,
         "convergence_data":  [float(x) for x in ga_result.convergence_data],
+        "mean_convergence_data": [float(x) for x in getattr(ga_result, "mean_convergence_data", [])],
         "generation_history": ga_result.generation_history,
         "pareto_front":      [_ind_to_dict(ind) for ind in ga_result.pareto_front],
         "population":        [_ind_to_dict(ind) for ind in ga_result.population],
@@ -352,6 +353,7 @@ def load_ga_result(filepath: str):
         n_generations=raw.get("n_generations", 0),
     )
     result.convergence_data    = raw.get("convergence_data", [])
+    result.mean_convergence_data = raw.get("mean_convergence_data", [])
     result.generation_history  = raw.get("generation_history", [])
     result.pareto_front        = [_dict_to_ind(d) for d in raw.get("pareto_front", [])]
     result.population          = [_dict_to_ind(d) for d in raw.get("population", [])]

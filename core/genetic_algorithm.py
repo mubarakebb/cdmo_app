@@ -83,6 +83,7 @@ class GAResult:
     design_type: str = "cross_flow"
     material: str = "PLA"
     convergence_data: List[float] = field(default_factory=list)
+    mean_convergence_data: List[float] = field(default_factory=list)
 
 
 def genes_to_params(genes: np.ndarray, design_type: str = "cross_flow") -> CarrierParams:
@@ -503,9 +504,11 @@ def run_genetic_algorithm(
         feasible = [ind for ind in population if ind.feasible]
         if feasible:
             best_composite = max(feasible, key=lambda x: x.composite_score)
+            mean_composite = float(np.mean([ind.composite_score for ind in feasible]))
             result.generation_history.append({
                 "generation": gen + 1,
                 "best_composite": best_composite.composite_score,
+                "mean_composite": mean_composite,
                 "best_sav": best_composite.obj_sav,
                 "best_porosity": best_composite.obj_porosity,
                 "best_flow": best_composite.obj_flow,
@@ -513,6 +516,7 @@ def run_genetic_algorithm(
                 "population_size": len(feasible),
             })
             result.convergence_data.append(best_composite.composite_score)
+            result.mean_convergence_data.append(mean_composite)
         
         if progress_callback:
             best_s = best_composite.composite_score if feasible else 0

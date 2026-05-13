@@ -261,7 +261,7 @@ with col:
             autocomplete="new-password",
         )
         st.markdown(
-            '<p class="pw-hint">🔒 Minimum 8 characters — stored with PBKDF2-SHA256 hashing.</p>',
+            '<p class="pw-hint">🔒 Minimum 8 characters.</p>',
             unsafe_allow_html=True,
         )
         confirm = st.text_input(

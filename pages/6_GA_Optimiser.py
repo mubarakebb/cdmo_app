@@ -235,44 +235,54 @@ if result.best_composite:
 st.markdown("---")
 
 # ─── Convergence Chart ────────────────────────────────────────────────────────
-if result.convergence_data:
-    col_conv, col_hist = st.columns(2)
-    with col_conv:
-        st.markdown("#### Convergence Curve")
-        fig_conv = go.Figure(go.Scatter(
-            x=list(range(1, len(result.convergence_data) + 1)),
-            y=result.convergence_data,
+if result.generation_history:
+    st.markdown("#### Genetic Algorithm Convergence")
+    hist_df = pd.DataFrame(result.generation_history)
+    fig_conv = go.Figure()
+    fig_conv.add_trace(go.Scatter(
+        x=hist_df["generation"],
+        y=hist_df["best_composite"],
+        mode="lines+markers",
+        name="Best fitness",
+        line=dict(color="#922b21", width=2.5),
+        marker=dict(size=6),
+    ))
+    if "mean_composite" in hist_df.columns:
+        fig_conv.add_trace(go.Scatter(
+            x=hist_df["generation"],
+            y=hist_df["mean_composite"],
             mode="lines+markers",
-            line=dict(color="#922b21", width=2.5),
+            name="Mean fitness",
+            line=dict(color="#1f77b4", width=2.5, dash="dash"),
             marker=dict(size=6),
-            fill="tozeroy", fillcolor="rgba(146,43,33,0.08)"
         ))
-        fig_conv.update_layout(
-            xaxis_title="Generation", yaxis_title="Best Composite Score",
-            yaxis=dict(range=[0, 1]), height=300, plot_bgcolor="white")
-        fig_conv.update_xaxes(showgrid=True, gridcolor="#f0f0f0")
-        fig_conv.update_yaxes(showgrid=True, gridcolor="#f0f0f0")
-        st.plotly_chart(fig_conv, use_container_width=True)
+    fig_conv.update_layout(
+        xaxis_title="Generation",
+        yaxis_title="Fitness",
+        height=340,
+        plot_bgcolor="white",
+        legend=dict(orientation="h", y=-0.25),
+    )
+    fig_conv.update_xaxes(showgrid=True, gridcolor="#f0f0f0")
+    fig_conv.update_yaxes(showgrid=True, gridcolor="#f0f0f0")
+    st.plotly_chart(fig_conv, use_container_width=True)
 
-    with col_hist:
-        st.markdown("#### Generation History")
-        if result.generation_history:
-            hist_df = pd.DataFrame(result.generation_history)
-            fig_hist = go.Figure()
-            fig_hist.add_trace(go.Scatter(
-                x=hist_df["generation"], y=hist_df["best_sav"],
-                mode="lines", name="Best SA/V", line=dict(color="#2196F3")))
-            fig_hist.add_trace(go.Scatter(
-                x=hist_df["generation"], y=hist_df["best_porosity"],
-                mode="lines", name="Best Porosity", line=dict(color="#4CAF50")))
-            fig_hist.add_trace(go.Scatter(
-                x=hist_df["generation"], y=hist_df["best_flow"],
-                mode="lines", name="Best Flow", line=dict(color="#FF9800")))
-            fig_hist.update_layout(
-                xaxis_title="Generation", yaxis_title="Objective Value",
-                height=300, plot_bgcolor="white",
-                legend=dict(orientation="h", y=-0.35))
-            st.plotly_chart(fig_hist, use_container_width=True)
+    st.markdown("#### Generation History")
+    fig_hist = go.Figure()
+    fig_hist.add_trace(go.Scatter(
+        x=hist_df["generation"], y=hist_df["best_sav"],
+        mode="lines", name="Best SA/V", line=dict(color="#2196F3")))
+    fig_hist.add_trace(go.Scatter(
+        x=hist_df["generation"], y=hist_df["best_porosity"],
+        mode="lines", name="Best Porosity", line=dict(color="#4CAF50")))
+    fig_hist.add_trace(go.Scatter(
+        x=hist_df["generation"], y=hist_df["best_flow"],
+        mode="lines", name="Best Flow", line=dict(color="#FF9800")))
+    fig_hist.update_layout(
+        xaxis_title="Generation", yaxis_title="Objective Value",
+        height=300, plot_bgcolor="white",
+        legend=dict(orientation="h", y=-0.35))
+    st.plotly_chart(fig_hist, use_container_width=True)
 
 st.markdown("---")
 
