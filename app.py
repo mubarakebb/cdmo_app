@@ -2,7 +2,9 @@
 CDMO App Entrypoint
 
 Uses Streamlit's `st.navigation` + `st.Page` to define sidebar labels/icons.
-Unauthenticated users are redirected to the Login page.
+
+NOTE: Auth gate is currently DISABLED — uncomment the block below to re-enable
+sign-in / sign-up enforcement.
 """
 
 import streamlit as st
@@ -12,19 +14,19 @@ from utils.auth import is_authenticated, get_current_user
 st.set_page_config(page_title="CDMO Studio", page_icon="🔬", layout="wide")
 inject_base_styles()
 
-# ─── Auth gate ────────────────────────────────────────────────────────────────
-# Auth-only pages — always accessible so the redirect can reach them
-auth_pages = [
-    st.Page("pages/auth/login.py",  title="Sign In",  icon="🔑"),
-    st.Page("pages/auth/signup.py", title="Sign Up",  icon="📝"),
-]
+# ─── Auth gate (disabled) ─────────────────────────────────────────────────────
+# Uncomment this block to require login before accessing the app.
+#
+# auth_pages = [
+#     st.Page("pages/auth/login.py",  title="Sign In",  icon="🔑"),
+#     st.Page("pages/auth/signup.py", title="Sign Up",  icon="📝"),
+# ]
+# if not is_authenticated():
+#     nav = st.navigation(auth_pages, position="hidden")
+#     nav.run()
+#     st.stop()
 
-if not is_authenticated():
-    nav = st.navigation(auth_pages, position="hidden")
-    nav.run()
-    st.stop()
-
-# ─── Authenticated navigation ─────────────────────────────────────────────────
+# ─── Main navigation ──────────────────────────────────────────────────────────
 pages = [
     st.Page("home.py",                          title="Home",                 icon="🏠"),
     st.Page("pages/1_Upload_Analyse.py",         title="Upload & Analyse",     icon="📤"),
