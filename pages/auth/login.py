@@ -172,6 +172,50 @@ st.markdown(
         box-shadow: 0 4px 14px rgba(46,134,171,0.38) !important;
       }
 
+      /* ── Responsive ── */
+
+      /* ① Narrow screens: card fills the viewport (hide spacer columns) */
+      @media (max-width: 640px) {
+        [data-testid="stHorizontalBlock"]:has(.auth-card) > [data-testid="stColumn"]:first-child,
+        [data-testid="stHorizontalBlock"]:has(.auth-card) > [data-testid="stColumn"]:last-child,
+        [data-testid="stColumns"]:has(.auth-card)         > [data-testid="stColumn"]:first-child,
+        [data-testid="stColumns"]:has(.auth-card)         > [data-testid="stColumn"]:last-child {
+          display: none !important;
+        }
+        [data-testid="stHorizontalBlock"]:has(.auth-card) > [data-testid="stColumn"]:nth-child(2),
+        [data-testid="stColumns"]:has(.auth-card)         > [data-testid="stColumn"]:nth-child(2) {
+          width: 100% !important;
+          min-width: 100% !important;
+          flex: 0 0 100% !important;
+        }
+        .auth-card { padding: 1.8rem 1.2rem 0.5rem !important; }
+      }
+
+      /* ② Very narrow screens: stack footer row, centre both items */
+      @media (max-width: 480px) {
+        [data-testid="stHorizontalBlock"]:has(.auth-footer-question),
+        [data-testid="stColumns"]:has(.auth-footer-question) {
+          flex-wrap: wrap !important;
+          justify-content: center !important;
+          gap: 0.35rem !important;
+        }
+        [data-testid="stHorizontalBlock"]:has(.auth-footer-question) > [data-testid="stColumn"],
+        [data-testid="stColumns"]:has(.auth-footer-question)          > [data-testid="stColumn"] {
+          width: 100% !important;
+          min-width: 100% !important;
+          flex: 0 0 100% !important;
+        }
+        .auth-footer-question {
+          text-align: center !important;
+          padding-top: 0 !important;
+        }
+        [data-testid="stPageLink"] { text-align: center !important; }
+        [data-testid="stPageLink"] a {
+          justify-content: center !important;
+          width: auto !important;
+        }
+      }
+
       /* ── Trust badge strip ── */
       .auth-trust {
         display: flex;
