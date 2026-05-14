@@ -145,23 +145,57 @@ st.markdown(
         font-weight: 500;
       }
 
-      .auth-footer {
-        text-align: center;
+      /* ── Footer row: "Already have an account?" + pill button on one line ── */
+      .auth-footer-divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 0.8rem 0 0.65rem;
+      }
+      .auth-footer-question {
         font-size: 0.84rem;
         color: var(--text-muted);
-        margin-top: 1.3rem;
-        padding-top: 1.2rem;
-        border-top: 1px solid var(--border);
+        text-align: right;
+        margin: 0;
+        padding-top: 6px;
+        line-height: 1.4;
+        white-space: nowrap;
       }
-      /* st.page_link styled as footer link */
-      .auth-footer-nav [data-testid="stPageLink"] a {
+
+      /* Pill-button style for the st.page_link */
+      [data-testid="stPageLink"] {
+        margin-top: 0 !important;
+        line-height: 1 !important;
+      }
+      [data-testid="stPageLink"] a {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.25rem !important;
+        padding: 0.32rem 0.85rem !important;
+        border-radius: var(--radius-pill) !important;
+        background: linear-gradient(135deg,
+          rgba(20,184,166,0.12) 0%,
+          rgba(88,80,236,0.12) 100%) !important;
+        border: 1px solid rgba(20,184,166,0.40) !important;
         color: var(--accent-teal) !important;
-        font-size: 0.84rem !important;
-        font-weight: 600 !important;
+        font-family: var(--font-heading) !important;
+        font-size: 0.80rem !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.01em !important;
         text-decoration: none !important;
+        white-space: nowrap !important;
+        transition: background 0.2s, color 0.2s,
+                    border-color 0.2s, box-shadow 0.2s,
+                    transform 0.2s !important;
       }
-      .auth-footer-nav [data-testid="stPageLink"] a:hover { text-decoration: underline !important; }
-      .auth-footer-nav { text-align: center; margin-top: 0.5rem; }
+      [data-testid="stPageLink"] a:hover {
+        background: linear-gradient(135deg,
+          var(--accent-teal) 0%, var(--accent-indigo) 100%) !important;
+        border-color: transparent !important;
+        color: #ffffff !important;
+        text-decoration: none !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 14px rgba(20,184,166,0.38) !important;
+      }
 
       /* Remove "Press Enter to submit form" hint */
       [data-testid="InputInstructions"] { display: none !important; }
@@ -307,10 +341,12 @@ with col:
             except AuthError as e:
                 st.error(str(e))
 
-    st.markdown(
-        '<div class="auth-footer">Already have an account?</div>',
-        unsafe_allow_html=True,
-    )
-    st.markdown('<div class="auth-footer-nav">', unsafe_allow_html=True)
-    st.page_link("pages/auth/login.py", label="Sign in instead →")
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<hr class="auth-footer-divider">', unsafe_allow_html=True)
+    _fc1, _fc2 = st.columns([5, 4], gap="small")
+    with _fc1:
+        st.markdown(
+            '<p class="auth-footer-question">Already have an account?</p>',
+            unsafe_allow_html=True,
+        )
+    with _fc2:
+        st.page_link("pages/auth/login.py", label="Sign in instead →")
