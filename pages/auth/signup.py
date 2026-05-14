@@ -8,7 +8,7 @@ from utils.ui import inject_base_styles
 
 # Already logged in → go straight to home
 if is_authenticated():
-  st.switch_page("app.py")
+    st.switch_page("home.py")
 
 # ─── Page-specific overrides ──────────────────────────────────────────────────
 st.markdown(
