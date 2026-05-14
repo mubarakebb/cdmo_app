@@ -145,62 +145,53 @@ st.markdown(
         font-weight: 500;
       }
 
-      /* ── Footer row: "Already have an account?" + pill button on one line ── */
-      .auth-footer-divider {
-        border: none;
+      /* ── Footer row ── */
+      .auth-footer-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        flex-wrap: wrap;
         border-top: 1px solid var(--border);
-        margin: 0.8rem 0 0.65rem;
+        padding: 0.85rem 0 0.4rem;
+        margin-top: 0.6rem;
       }
-      .auth-footer-question {
+      .auth-footer-text {
         font-size: 0.84rem;
         color: var(--text-muted);
-        text-align: right;
-        margin: 0;
-        padding-top: 6px;
-        line-height: 1.4;
         white-space: nowrap;
       }
-
-      /* Pill-button style for the st.page_link */
-      [data-testid="stPageLink"] {
-        margin-top: 0 !important;
-        line-height: 1 !important;
-      }
-      [data-testid="stPageLink"] a {
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 0.25rem !important;
-        padding: 0.32rem 0.85rem !important;
-        border-radius: var(--radius-pill) !important;
+      .auth-footer-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.30rem 0.85rem;
+        border-radius: var(--radius-pill);
         background: linear-gradient(135deg,
-          rgba(20,184,166,0.12) 0%,
-          rgba(88,80,236,0.12) 100%) !important;
-        border: 1px solid rgba(20,184,166,0.40) !important;
+          rgba(20,184,166,0.12) 0%, rgba(88,80,236,0.12) 100%);
+        border: 1px solid rgba(20,184,166,0.40);
         color: var(--accent-teal) !important;
-        font-family: var(--font-heading) !important;
-        font-size: 0.80rem !important;
-        font-weight: 700 !important;
-        letter-spacing: -0.01em !important;
+        font-family: var(--font-heading);
+        font-size: 0.80rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
         text-decoration: none !important;
-        white-space: nowrap !important;
+        white-space: nowrap;
         transition: background 0.2s, color 0.2s,
-                    border-color 0.2s, box-shadow 0.2s,
-                    transform 0.2s !important;
+                    border-color 0.2s, box-shadow 0.2s, transform 0.2s;
       }
-      [data-testid="stPageLink"] a:hover {
+      .auth-footer-pill:hover {
         background: linear-gradient(135deg,
-          var(--accent-teal) 0%, var(--accent-indigo) 100%) !important;
-        border-color: transparent !important;
+          var(--accent-teal) 0%, var(--accent-indigo) 100%);
+        border-color: transparent;
         color: #ffffff !important;
         text-decoration: none !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 4px 14px rgba(20,184,166,0.38) !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(20,184,166,0.38);
       }
 
       /* ── Responsive ── */
-
-      /* ① Narrow screens: card fills the viewport (hide spacer columns) */
       @media (max-width: 640px) {
+        /* Card fills the viewport — hide spacer columns */
         [data-testid="stHorizontalBlock"]:has(.auth-card) > [data-testid="stColumn"]:first-child,
         [data-testid="stHorizontalBlock"]:has(.auth-card) > [data-testid="stColumn"]:last-child,
         [data-testid="stColumns"]:has(.auth-card)         > [data-testid="stColumn"]:first-child,
@@ -215,35 +206,10 @@ st.markdown(
         }
         .auth-card { padding: 1.8rem 1.2rem 0.5rem !important; }
       }
-
-      /* ② Very narrow screens: stack footer row, centre both items */
-      @media (max-width: 480px) {
-        [data-testid="stHorizontalBlock"]:has(.auth-footer-question),
-        [data-testid="stColumns"]:has(.auth-footer-question) {
-          flex-wrap: wrap !important;
-          justify-content: center !important;
-          gap: 0.35rem !important;
-        }
-        [data-testid="stHorizontalBlock"]:has(.auth-footer-question) > [data-testid="stColumn"],
-        [data-testid="stColumns"]:has(.auth-footer-question)          > [data-testid="stColumn"] {
-          width: 100% !important;
-          min-width: 100% !important;
-          flex: 0 0 100% !important;
-        }
-        .auth-footer-question {
-          text-align: center !important;
-          padding-top: 0 !important;
-        }
-        [data-testid="stPageLink"] { text-align: center !important; }
-        [data-testid="stPageLink"] a {
-          justify-content: center !important;
-          width: auto !important;
-        }
-      }
+      /* Footer row wraps via flex-wrap at narrow widths — no extra rules needed */
 
       /* ── Form columns (Full Name / Email) responsive ── */
       @media (max-width: 480px) {
-        /* Let the two-column form row stack on very small screens */
         [data-testid="stForm"] [data-testid="stHorizontalBlock"],
         [data-testid="stForm"] [data-testid="stColumns"] {
           flex-wrap: wrap !important;
@@ -400,12 +366,12 @@ with col:
             except AuthError as e:
                 st.error(str(e))
 
-    st.markdown('<hr class="auth-footer-divider">', unsafe_allow_html=True)
-    _fc1, _fc2 = st.columns([5, 4], gap="small")
-    with _fc1:
-        st.markdown(
-            '<p class="auth-footer-question">Already have an account?</p>',
-            unsafe_allow_html=True,
-        )
-    with _fc2:
-        st.page_link("pages/auth/login.py", label="Sign in instead →")
+    st.markdown(
+        """
+        <div class="auth-footer-row">
+          <span class="auth-footer-text">Already have an account?</span>
+          <a href="/auth/login" class="auth-footer-pill">Sign in instead →</a>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
