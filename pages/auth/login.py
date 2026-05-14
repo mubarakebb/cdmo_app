@@ -147,6 +147,16 @@ st.markdown(
       }
       .auth-footer-inline a:hover { text-decoration: underline !important; }
 
+      /* st.page_link styled as footer link */
+      [data-testid="stPageLink"] { text-align: center; }
+      [data-testid="stPageLink"] a {
+        color: var(--accent) !important;
+        font-size: 0.84rem !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
+      }
+      [data-testid="stPageLink"] a:hover { text-decoration: underline !important; }
+
       /* ── Trust badge strip ── */
       .auth-trust {
         display: flex;
@@ -261,14 +271,10 @@ with col:
                 st.error(str(e))
 
     st.markdown(
-        """
-        <div class="auth-footer-inline">
-          <span>Don't have an account?</span>
-          <a href="/auth/signup" target="_self">Create one free →</a>
-        </div>
-        """,
+        '<div class="auth-footer-inline"><span>Don\'t have an account?</span></div>',
         unsafe_allow_html=True,
     )
+    st.page_link("pages/auth/signup.py", label="Create one free →")
     st.markdown(
         """
         <div class="auth-trust">
