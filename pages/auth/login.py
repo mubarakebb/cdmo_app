@@ -120,42 +120,57 @@ st.markdown(
         margin: 0 0 1.6rem;
       }
 
-      /* ── Footer link ── */
-      .auth-footer {
-        text-align: center;
-        font-size: 0.84rem;
-        color: var(--text-muted);
-        margin-top: 0.8rem;
-        padding: 1rem 0 0.5rem;
+      /* ── Footer row: "Don't have an account?" + pill button on one line ── */
+      .auth-footer-divider {
+        border: none;
         border-top: 1px solid var(--border);
+        margin: 0.8rem 0 0.65rem;
       }
-      .auth-footer-inline {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.35rem;
-        flex-wrap: wrap;
-        margin-top: 0.5rem;
+      .auth-footer-question {
         font-size: 0.84rem;
         color: var(--text-muted);
+        text-align: right;
+        margin: 0;
+        padding-top: 6px;      /* vertically centre with pill */
+        line-height: 1.4;
+        white-space: nowrap;
       }
-      .auth-footer-inline a {
-        color: var(--accent) !important;
-        font-size: 0.84rem !important;
-        font-weight: 600 !important;
-        text-decoration: none !important;
-      }
-      .auth-footer-inline a:hover { text-decoration: underline !important; }
 
-      /* st.page_link styled as footer link */
-      [data-testid="stPageLink"] { text-align: center; }
-      [data-testid="stPageLink"] a {
-        color: var(--accent) !important;
-        font-size: 0.84rem !important;
-        font-weight: 600 !important;
-        text-decoration: none !important;
+      /* Pill-button style for the st.page_link */
+      [data-testid="stPageLink"] {
+        margin-top: 0 !important;
+        line-height: 1 !important;
       }
-      [data-testid="stPageLink"] a:hover { text-decoration: underline !important; }
+      [data-testid="stPageLink"] a {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.25rem !important;
+        padding: 0.32rem 0.85rem !important;
+        border-radius: var(--radius-pill) !important;
+        background: linear-gradient(135deg,
+          rgba(46,134,171,0.12) 0%,
+          rgba(88,80,236,0.12) 100%) !important;
+        border: 1px solid rgba(46,134,171,0.40) !important;
+        color: var(--accent) !important;
+        font-family: var(--font-heading) !important;
+        font-size: 0.80rem !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.01em !important;
+        text-decoration: none !important;
+        white-space: nowrap !important;
+        transition: background 0.2s, color 0.2s,
+                    border-color 0.2s, box-shadow 0.2s,
+                    transform 0.2s !important;
+      }
+      [data-testid="stPageLink"] a:hover {
+        background: linear-gradient(135deg,
+          var(--accent) 0%, var(--accent-indigo) 100%) !important;
+        border-color: transparent !important;
+        color: #ffffff !important;
+        text-decoration: none !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 14px rgba(46,134,171,0.38) !important;
+      }
 
       /* ── Trust badge strip ── */
       .auth-trust {
@@ -270,11 +285,15 @@ with col:
             except AuthError as e:
                 st.error(str(e))
 
-    st.markdown(
-        '<div class="auth-footer-inline"><span>Don\'t have an account?</span></div>',
-        unsafe_allow_html=True,
-    )
-    st.page_link("pages/auth/signup.py", label="Create one free →")
+    st.markdown('<hr class="auth-footer-divider">', unsafe_allow_html=True)
+    _fc1, _fc2 = st.columns([5, 4], gap="small")
+    with _fc1:
+        st.markdown(
+            '<p class="auth-footer-question">Don\'t have an account?</p>',
+            unsafe_allow_html=True,
+        )
+    with _fc2:
+        st.page_link("pages/auth/signup.py", label="Create one free →")
     st.markdown(
         """
         <div class="auth-trust">
