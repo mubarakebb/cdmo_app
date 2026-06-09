@@ -491,30 +491,29 @@ def generate_flow_regime_viz(carriers):
     """
     if not carriers:
         return None
-    
+
     mat_colors = {"PLA": "#1f77b4", "ABS": "#ff7f0e", "PETG": "#2ca02c", "PP": "#d62728"}
-    
-    # Assign simulated Reynolds numbers based on geometry/material
-    reynolds = {c: np.random.uniform(100, 1000) for c in carriers}
-    clogging_risk = {c: np.random.uniform(0.2, 0.8) for c in carriers}
-    
+
     fig = go.Figure()
     for mat in ["PLA", "ABS", "PETG", "PP"]:
         mat_c = [c for c in carriers if c.material == mat]
         if mat_c:
             fig.add_trace(go.Scatter(
-                x=[reynolds[c] for c in mat_c],
-                y=[clogging_risk[c] for c in mat_c],
-                mode='markers', name=mat,
+                x=[c.reynolds_number for c in mat_c],
+                y=[c.clogging_risk_score for c in mat_c],
+                mode="markers", name=mat,
                 marker=dict(size=8, color=mat_colors[mat]),
-                text=[c.filename for c in mat_c],
-                showlegend=True))
-    
+                text=[f"{c.filename}<br>Re={c.reynolds_number:.1f} | {c.flow_regime}" for c in mat_c],
+                hovertemplate="%{text}<extra></extra>",
+                showlegend=True,
+            ))
+
     fig.update_layout(
-        title="Flow Regime Visualization: Reynolds Number vs Clogging Risk",
+        title="Flow Regime Analysis: Reynolds Number vs Clogging Risk",
         xaxis_title="Reynolds Number",
-        yaxis_title="Clogging Risk Index (0-1)",
-        height=320, plot_bgcolor="white", paper_bgcolor="white")
+        yaxis_title="Clogging Risk Index (0–1)",
+        height=320, plot_bgcolor="white", paper_bgcolor="white",
+    )
     return _save_plotly_as_image(fig, height=320)
 
 
@@ -1108,8 +1107,29 @@ def generate_pdf_report(
             pdf.section_title("Reynolds Number vs Clogging Risk")
             pdf.image(flow_chart, x=10, w=190)
             pdf.ln(3)
-            pdf.body_text("Low Reynolds numbers (<300) indicate laminar flow; higher values suggest transitional/turbulent regimes. "
-                         "Clogging risk increases with lower porosity and smaller pore diameters.")
+            pdf.body_text(
+                "Low Reynolds numbers (<300) indicate laminar flow; higher values suggest "
+                "transitional/turbulent regimes. Clogging risk increases with lower porosity "
+                "and smaller pore diameters."
+            )
+            pdf.ln(4)
+            # Flow metrics summary table
+            pdf.section_title("Flow Metrics Summary (Top 15 Designs)")
+            flow_headers = ["Design", "Material", "Re", "Flow Regime", "ΔP (Pa/m)", "Mass Transfer (m/s)", "Clogging Risk"]
+            top15 = sorted(carriers, key=lambda c: c.rank)[:15]
+            flow_rows = [
+                [
+                    c.filename[:14],
+                    c.material,
+                    f"{c.reynolds_number:.1f}",
+                    c.flow_regime,
+                    f"{c.pressure_drop:.2f}",
+                    f"{c.mass_transfer_coeff:.2e}",
+                    f"{c.clogging_risk_score:.3f}",
+                ]
+                for c in top15
+            ]
+            pdf.data_table(flow_headers, flow_rows, col_widths=[28, 18, 16, 24, 24, 36, 30])
             try:
                 os.unlink(flow_chart)
             except:

@@ -74,6 +74,9 @@ class CarrierScore:
     buoyancy_score: float = 0.0
     pressure_drop: float = 0.0
     mass_transfer_coeff: float = 0.0
+    reynolds_number: float = 0.0
+    clogging_risk_score: float = 0.0
+    flow_regime: str = ""
     
     # Composite weighted score
     composite_score: float = 0.0
@@ -127,6 +130,9 @@ def score_carrier(
     cs.buoyancy_score = buoy.buoyancy_score
     cs.pressure_drop = flow.pressure_drop_per_m
     cs.mass_transfer_coeff = flow.mass_transfer_coefficient
+    cs.reynolds_number = flow.reynolds_number
+    cs.clogging_risk_score = flow.clogging_risk_score
+    cs.flow_regime = flow.flow_regime
     
     # Material-based scores (fixed per material)
     mat = MATERIALS[material_name]
