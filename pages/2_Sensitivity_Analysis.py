@@ -371,3 +371,71 @@ if show_all:
                         yaxis=dict(showgrid=True, gridcolor="#f0f0f0"),
                     )
                     st.plotly_chart(fig_mini, use_container_width=True)
+
+st.markdown("---")
+
+# ─── Download Results ─────────────────────────────────────────────────────────
+st.markdown("### Download Results")
+st.caption("Export sensitivity data as CSV for further analysis or reporting.")
+
+# Summary: one row per (parameter, objective) pair with computed metrics
+summary_rows = [
+    {
+        "Parameter":         r.parameter_name,
+        "Objective":         r.objective_name,
+        "Sensitivity Index": round(r.sensitivity_index, 6),
+        "Direction":         r.direction,
+        "R² (Linearity)":    round(r.r_squared, 6),
+    }
+    for r in report.results
+]
+summary_df = pd.DataFrame(summary_rows)
+
+# Matrix: pivot table matching the heatmap
+matrix_pivot = pd.DataFrame(matrix, index=params, columns=objectives).round(6)
+matrix_pivot.index.name = "Parameter"
+
+# Raw curves: every sampled (parameter_value, objective_value) point
+raw_rows = [
+    {
+        "Parameter":       r.parameter_name,
+        "Objective":       r.objective_name,
+        "Parameter Value": pv,
+        "Objective Value": ov,
+    }
+    for r in report.results
+    for pv, ov in zip(r.parameter_values, r.objective_values)
+]
+raw_df = pd.DataFrame(raw_rows)
+
+col_dl1, col_dl2, col_dl3 = st.columns(3)
+
+with col_dl1:
+    st.download_button(
+        "⬇ Summary Metrics (CSV)",
+        data=summary_df.to_csv(index=False).encode("utf-8"),
+        file_name="sensitivity_summary.csv",
+        mime="text/csv",
+        use_container_width=True,
+        help="Sensitivity index, direction, and R² for every parameter–objective pair.",
+    )
+
+with col_dl2:
+    st.download_button(
+        "⬇ Sensitivity Matrix (CSV)",
+        data=matrix_pivot.to_csv().encode("utf-8"),
+        file_name="sensitivity_matrix.csv",
+        mime="text/csv",
+        use_container_width=True,
+        help="Heatmap data as a parameters × objectives pivot table.",
+    )
+
+with col_dl3:
+    st.download_button(
+        "⬇ Raw Curve Data (CSV)",
+        data=raw_df.to_csv(index=False).encode("utf-8"),
+        file_name="sensitivity_curves.csv",
+        mime="text/csv",
+        use_container_width=True,
+        help="All sampled (parameter value, objective value) points for every curve.",
+    )
