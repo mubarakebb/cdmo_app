@@ -53,6 +53,16 @@ def _make_synthetic_geo(
         geo.sav_ratio = sav_ratio
         # Adjust surface area to match new SA/V while keeping volume
         geo.surface_area = sav_ratio * geo.volume
+        # Recompute specific_surface_area and hydraulic_diameter so that
+        # flow metrics actually respond to SA/V perturbations.
+        # specific_SA (m²/m³) = sav (mm⁻¹) × (1−ε) × 1000
+        por = geo.porosity
+        if 0 < por < 1:
+            geo.specific_surface_area = round(sav_ratio * (1.0 - por) * 1000.0, 2)
+            if geo.specific_surface_area > 0:
+                # dh (mm) = 4000 × ε / (specific_SA × (1−ε))
+                geo.hydraulic_diameter = round(
+                    4000.0 * por / (geo.specific_surface_area * (1.0 - por)), 4)
 
     if porosity is not None:
         geo.porosity = porosity
@@ -110,7 +120,7 @@ def _sensitivity_index(values: List[float]) -> float:
 
 
 def _r_squared(x_vals: List[float], y_vals: List[float]) -> float:
-    """R² of linear fit — measures linearity of the relationship."""
+    """R² of linear fit — measures linearity of the relationship (clipped to [0, 1])."""
     x = np.array(x_vals)
     y = np.array(y_vals)
     if len(x) < 3 or np.std(y) == 0:
@@ -119,7 +129,8 @@ def _r_squared(x_vals: List[float], y_vals: List[float]) -> float:
     y_fit = np.polyval(coeffs, x)
     ss_res = np.sum((y - y_fit) ** 2)
     ss_tot = np.sum((y - np.mean(y)) ** 2)
-    return float(1 - ss_res / ss_tot) if ss_tot > 0 else 1.0
+    r2 = float(1 - ss_res / ss_tot) if ss_tot > 0 else 1.0
+    return float(np.clip(r2, 0.0, 1.0))
 
 
 def _direction(values: List[float]) -> str:

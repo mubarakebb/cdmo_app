@@ -619,9 +619,12 @@ def generate_biofilm_prediction(carriers):
     days = [0, 30, 60, 90, 120]
     
     for c in top3:
-        # Simulate biofilm growth: logistic curve
-        biofilm_affinity = getattr(c, 'biofilm_affinity', 0.7)
-        coverage = [1 - np.exp(-biofilm_affinity * d / 50) * 100 for d in days]
+        # Logistic-style growth: C(t) = C_max × (1 - exp(-k × t / t_scale))
+        # coverage starts at 0% and asymptotes toward C_max (85–95%)
+        biofilm_affinity = getattr(c, 'score_biofilm_affinity', 0.7)
+        c_max = 85 + 10 * biofilm_affinity          # 85–95% depending on affinity
+        k = biofilm_affinity * 0.05                 # growth rate constant
+        coverage = [c_max * (1 - np.exp(-k * d)) for d in days]
         
         fig.add_trace(go.Scatter(
             x=days, y=coverage,
@@ -1099,43 +1102,47 @@ def generate_pdf_report(
         pdf.data_table(geo_headers, geo_rows, col_widths=[28, 32, 32, 24, 24, 30])
     
     # ── PAGE 17: FLOW REGIME VISUALIZATION ────────────────────────────────
-    try:
-        flow_chart = generate_flow_regime_viz(carriers)
-        if flow_chart:
-            pdf.add_page()
-            pdf.chapter_title("16. Flow Regime Analysis")
-            pdf.section_title("Reynolds Number vs Clogging Risk")
-            pdf.image(flow_chart, x=10, w=190)
-            pdf.ln(3)
-            pdf.body_text(
-                "Low Reynolds numbers (<300) indicate laminar flow; higher values suggest "
-                "transitional/turbulent regimes. Clogging risk increases with lower porosity "
-                "and smaller pore diameters."
-            )
-            pdf.ln(4)
-            # Flow metrics summary table
-            pdf.section_title("Flow Metrics Summary (Top 15 Designs)")
-            flow_headers = ["Design", "Material", "Re", "Flow Regime", "ΔP (Pa/m)", "Mass Transfer (m/s)", "Clogging Risk"]
-            top15 = sorted(carriers, key=lambda c: c.rank)[:15]
-            flow_rows = [
-                [
-                    c.filename[:14],
-                    c.material,
-                    f"{c.reynolds_number:.1f}",
-                    c.flow_regime,
-                    f"{c.pressure_drop:.2f}",
-                    f"{c.mass_transfer_coeff:.2e}",
-                    f"{c.clogging_risk_score:.3f}",
-                ]
-                for c in top15
+    if carriers:
+        pdf.add_page()
+        pdf.chapter_title("16. Flow Regime Analysis")
+
+        # Chart — optional: fails silently if kaleido / image export is unavailable
+        try:
+            flow_chart = generate_flow_regime_viz(carriers)
+            if flow_chart:
+                pdf.section_title("Reynolds Number vs Clogging Risk")
+                pdf.image(flow_chart, x=10, w=190)
+                pdf.ln(3)
+                pdf.body_text(
+                    "Low Reynolds numbers (<300) indicate laminar flow; higher values suggest "
+                    "transitional/turbulent regimes. Clogging risk increases with lower porosity "
+                    "and smaller pore diameters."
+                )
+                pdf.ln(4)
+                try:
+                    os.unlink(flow_chart)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+        # Metrics table — always written regardless of chart success
+        pdf.section_title("Flow Metrics Summary (Top 15 Designs)")
+        flow_headers = ["Design", "Material", "Re", "Flow Regime", "dP (Pa/m)", "Mass Transfer", "Clog Risk"]
+        top15_flow = sorted(carriers, key=lambda c: c.rank)[:15]
+        flow_rows = [
+            [
+                c.filename[:14],
+                c.material,
+                f"{c.reynolds_number:.1f}",
+                c.flow_regime if c.flow_regime else "—",
+                f"{c.pressure_drop:.2f}",
+                f"{c.mass_transfer_coeff:.2e}",
+                f"{c.clogging_risk_score:.3f}",
             ]
-            pdf.data_table(flow_headers, flow_rows, col_widths=[28, 18, 16, 24, 24, 36, 30])
-            try:
-                os.unlink(flow_chart)
-            except:
-                pass
-    except Exception as e:
-        pass
+            for c in top15_flow
+        ]
+        pdf.data_table(flow_headers, flow_rows, col_widths=[30, 18, 16, 26, 24, 32, 24])
     
     # ── PAGE 18: POROSITY HEATMAP ──────────────────────────────────────────
     try:

@@ -75,7 +75,12 @@ def compute_flow_metrics(
     porosity = geo.porosity
     dh_m = geo.hydraulic_diameter / 1000.0  # mm -> m
     specific_sa = geo.specific_surface_area  # m²/m³ already in SI
-    
+
+    # Fallback: derive dh from specific_surface_area when hydraulic_diameter is
+    # 0 (e.g. non-watertight mesh whose trimesh volume = 0 → porosity = 1.0).
+    if dh_m <= 0 and specific_sa > 0 and 0 < porosity < 1:
+        dh_m = (4.0 * porosity) / (specific_sa * (1.0 - porosity))
+
     # Guard against degenerate geometry
     if dh_m <= 0 or porosity <= 0 or porosity >= 1:
         flow.flow_regime = "Undefined"
@@ -83,13 +88,15 @@ def compute_flow_metrics(
         return flow
 
     # ── Reynolds Number ──────────────────────────────────────────────
-    # Using hydraulic diameter as characteristic length
+    # Re = (rho × U × d_p) / mu  where d_p is hydraulic diameter in metres
     flow.reynolds_number = round(
         (fluid_density * superficial_velocity * dh_m) / fluid_viscosity, 4)
-    
+
     if flow.reynolds_number < 10:
-        flow.flow_regime = "Laminar (Darcy)"
+        flow.flow_regime = "Creeping / Stokes"
     elif flow.reynolds_number < 300:
+        flow.flow_regime = "Laminar"
+    elif flow.reynolds_number < 2300:
         flow.flow_regime = "Transitional"
     else:
         flow.flow_regime = "Turbulent"
@@ -167,10 +174,12 @@ def compute_flow_metrics(
     # Flow regime bonus (transitional is ideal for biofilm reactors)
     if flow.flow_regime == "Transitional":
         regime_score = 1.0
-    elif flow.flow_regime == "Laminar (Darcy)":
+    elif flow.flow_regime == "Laminar":
+        regime_score = 0.8
+    elif flow.flow_regime == "Creeping / Stokes":
         regime_score = 0.6
-    else:
-        regime_score = 0.75
+    else:  # Turbulent
+        regime_score = 0.5
     
     flow.flow_efficiency_score = round(
         0.30 * pressure_score +
